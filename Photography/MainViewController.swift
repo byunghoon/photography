@@ -9,13 +9,22 @@
 import UIKit
 import AVFoundation
 
+class PreviewView: UIView {
+    override class func layerClass() -> AnyClass {
+        return AVCaptureVideoPreviewLayer.self
+    }
+}
+
 class MainViewController: UIViewController, SessionManagerDelegate {
+    private var previewView: PreviewView = PreviewView()
     private var sessionManager: SessionManager!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        sessionManager = SessionManager(previewLayer: view.layer as! AVCaptureVideoPreviewLayer)
+        view.addSubview(previewView)
+        
+        sessionManager = SessionManager(previewLayer: previewView.layer as! AVCaptureVideoPreviewLayer)
         
         // disable UI
         // ...
