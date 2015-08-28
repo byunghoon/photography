@@ -25,6 +25,7 @@ class MainViewController: UIViewController, SessionManagerDelegate {
         view.addSubview(previewView)
         
         sessionManager = SessionManager(previewLayer: previewView.layer as! AVCaptureVideoPreviewLayer)
+        sessionManager.delegate = self
         
         // disable UI
         // ...
@@ -76,7 +77,10 @@ private protocol SessionManagerDelegate {
     func sessionManager(sessionManager: SessionManager, didFailResumptionWithStatus: SessionStatus)
 }
 
-private class SessionManager {
+let SessionRunningContext = UnsafeMutablePointer<Void>()
+let CapturingStillImageContext = UnsafeMutablePointer<Void>()
+
+private class SessionManager: NSObject {
     let session = AVCaptureSession()
     let queue = dispatch_queue_create("queue", DISPATCH_QUEUE_SERIAL)
     
@@ -132,13 +136,8 @@ private class SessionManager {
         })
     }
     
-    func addObservers() {
-        
-    }
     
-    func removeObservers() {
-        
-    }
+    // MARK: I/O setup
     
     private func setupInput(devicePosition preferringDevicePosition: AVCaptureDevicePosition) {
         if let input = currentInput {
@@ -187,5 +186,53 @@ private class SessionManager {
             status = .ConfigurationFailed
         }
     }
+    
+    
+    // MARK: KVO
+    
+    let kSessionRunning = "sessionRunning"
+    let kCapturingStillImage = "capturingStillImage"
+    
+    private func addObservers() {
+        // TODO: try removing context and use keyPath
+        session.addObserver(self, forKeyPath: kSessionRunning, options: NSKeyValueObservingOptions.New, context: SessionRunningContext)
+        currentOutput?.addObserver(self, forKeyPath: kCapturingStillImage, options: NSKeyValueObservingOptions.New, context: CapturingStillImageContext)
+        
+        if let device = currentInput?.device {
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: "subjectAreaDidChange:", name: AVCaptureDeviceSubjectAreaDidChangeNotification, object: device)
+        }
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "sessionRuntimeError:", name: AVCaptureSessionRuntimeErrorNotification, object: session)
+        
+        // for iOS 9: may need to listen to AVCaptureSessionWasInterruptedNotification AVCaptureSessionInterruptionEndedNotification
+    }
+    
+    private func removeObservers() {
+        NSNotificationCenter.defaultCenter().removeObserver(self)
+        
+        session.removeObserver(self, forKeyPath: kSessionRunning, context: SessionRunningContext)
+        currentOutput?.removeObserver(self, forKeyPath: kCapturingStillImage, context: CapturingStillImageContext)
+    }
+    
+    private override func observeValueForKeyPath(keyPath: String, ofObject object: AnyObject, change: [NSObject : AnyObject], context: UnsafeMutablePointer<Void>) {
+        if context == SessionRunningContext {
+            
+            
+        } else if context == CapturingStillImageContext {
+            
+            
+        } else {
+            super.observeValueForKeyPath(keyPath, ofObject: object, change: change, context: context)
+        }
+    }
+    
+    func subjectAreaDidChange(notification: NSNotification) {
+        
+    }
+    
+    func sessionRuntimeError(notification: NSNotification) {
+        
+    }
+
 }
 
