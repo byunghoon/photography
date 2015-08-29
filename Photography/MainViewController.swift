@@ -66,4 +66,13 @@ class MainViewController: UIViewController, SessionManagerDelegate {
     func sessionManager(sessionManager: SessionManager, didFailResumptionWithStatus: SessionStatus) {
         presentViewController(UIAlertController(title: "Session resumption failed", message: nil, preferredStyle: UIAlertControllerStyle.Alert), animated: true, completion: nil)
     }
+    
+    func sessionManager(sessionManager: SessionManager, isCapturingStillImage: Bool) {
+        //
+    }
+    
+    func sessionManager(sessionManager: SessionManager, isSessionRunning: Bool) {
+        //
+    }
+    
 }

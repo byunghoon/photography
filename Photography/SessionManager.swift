@@ -9,6 +9,9 @@
 import UIKit
 import AVFoundation
 
+private let SessionRunningContext = UnsafeMutablePointer<Void>()
+private let CapturingStillImageContext = UnsafeMutablePointer<Void>()
+
 enum SessionStatus {
     case Success, NotAuthorized, ConfigurationFailed
 }
@@ -16,10 +19,10 @@ enum SessionStatus {
 protocol SessionManagerDelegate {
     func sessionManager(sessionManager: SessionManager, shouldUpdateOrientation orientation: UIInterfaceOrientation) //?
     func sessionManager(sessionManager: SessionManager, didFailResumptionWithStatus: SessionStatus)
+    
+    func sessionManager(sessionManager: SessionManager, isCapturingStillImage: Bool)
+    func sessionManager(sessionManager: SessionManager, isSessionRunning: Bool)
 }
-
-let SessionRunningContext = UnsafeMutablePointer<Void>()
-let CapturingStillImageContext = UnsafeMutablePointer<Void>()
 
 class SessionManager: NSObject {
     let session = AVCaptureSession()
@@ -29,6 +32,10 @@ class SessionManager: NSObject {
     var delegate: SessionManagerDelegate?
     
     var status: SessionStatus = .NotAuthorized
+    var sessionShouldRun = false
+    
+    
+    // MARK: session lifecycle
     
     init(previewLayer layer: AVCaptureVideoPreviewLayer) {
         previewLayer = layer
@@ -58,7 +65,9 @@ class SessionManager: NSObject {
             switch (self.status) {
             case .Success:
                 self.addObservers()
+                
                 self.session.startRunning()
+                self.sessionShouldRun = self.session.running
                 
             default:
                 self.delegate?.sessionManager(self, didFailResumptionWithStatus: self.status)
@@ -70,9 +79,26 @@ class SessionManager: NSObject {
         dispatch_async(queue, { () -> Void in
             if self.status == .Success {
                 self.session.stopRunning()
+                // is self.sessionShouldRun = self.session.running required?
+                
                 self.removeObservers()
             }
         })
+    }
+    
+    
+    // MARK: camera
+    
+    func changeCamera() {
+        
+    }
+    
+    func snapStillImage() {
+        
+    }
+    
+    func focus(atDevicePoint devicePoint: CGPoint) {
+        
     }
     
     
@@ -158,10 +184,14 @@ class SessionManager: NSObject {
     
     override func observeValueForKeyPath(keyPath: String, ofObject object: AnyObject, change: [NSObject : AnyObject], context: UnsafeMutablePointer<Void>) {
         if context == SessionRunningContext {
-            
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                delegate?.sessionManager(self, isCapturingStillImage: change[NSKeyValueChangeNewKey]?.boolValue ?? false)
+            })
             
         } else if context == CapturingStillImageContext {
-            
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                delegate?.sessionManager(self, isSessionRunning: change[NSKeyValueChangeNewKey]?.boolValue ?? false)
+            })
             
         } else {
             super.observeValueForKeyPath(keyPath, ofObject: object, change: change, context: context)
@@ -169,11 +199,31 @@ class SessionManager: NSObject {
     }
     
     func subjectAreaDidChange(notification: NSNotification) {
-        
+        //CGPoint devicePoint = CGPointMake( 0.5, 0.5 );
+        //[self focusWithMode:AVCaptureFocusModeContinuousAutoFocus exposeWithMode:AVCaptureExposureModeContinuousAutoExposure atDevicePoint:devicePoint monitorSubjectAreaChange:NO];
     }
     
     func sessionRuntimeError(notification: NSNotification) {
-        
+        if let error = notification.userInfo?[AVCaptureSessionErrorKey] as? NSError {
+            println("Capture session runtime error \(error)")
+            
+            // Automatically try to restart the session running if media services were reset and the last start running succeeded.
+            // Otherwise, enable the user to try to resume the session running.
+            if error.code == AVError.MediaServicesWereReset.rawValue {
+                dispatch_async(queue, { () -> Void in
+                    if self.sessionShouldRun {
+                        self.session.startRunning()
+                        self.sessionShouldRun = self.session.running
+                        
+                    } else {
+                        // show resume button (from main queue)
+                    }
+                })
+            }
+            
+        } else {
+            // show resume button (from main queue)
+        }
     }
     
 }
