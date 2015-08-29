@@ -8,6 +8,7 @@
 
 import UIKit
 import AVFoundation
+import Photos
 
 private let SessionRunningContext = UnsafeMutablePointer<Void>()
 private let CapturingStillImageContext = UnsafeMutablePointer<Void>()
@@ -94,7 +95,52 @@ class SessionManager: NSObject {
     }
     
     func snapStillImage() {
-        
+        dispatch_async(queue) { () -> Void in
+            guard let stillImageOutput = self.currentOutput else {
+                print("Still image output does not exist")
+                return
+            }
+            
+            let connection = stillImageOutput.connectionWithMediaType(AVMediaTypeVideo)
+            connection.videoOrientation = self.previewLayer.connection.videoOrientation
+            
+            // might want to update flash settings (see line 558 in AAPLCameraViewController.m)
+            
+            stillImageOutput.captureStillImageAsynchronouslyFromConnection(connection, completionHandler: { (imageDataSampleBuffer: CMSampleBuffer!, error: NSError!) -> Void in
+                // The sample buffer is not retained. Create image data before saving the still image to the photo library asynchronously.
+                let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(imageDataSampleBuffer)
+                PHPhotoLibrary.requestAuthorization({ (status: PHAuthorizationStatus) -> Void in
+                    if status != .Authorized {
+                        print("Access to camera roll is not authorized")
+                        return
+                    }
+                    
+                    // TODO: iOS9 - use PHAssetCreationRequest.addResourceWithType() instead
+                    // see line 569 in AAPLCameraViewController.m
+                    
+                    guard let temporaryFileURL = Utility.getTemporaryFileURL() else {
+                        print("Unable to create temporary file name")
+                        return
+                    }
+                    
+                    PHPhotoLibrary.sharedPhotoLibrary().performChanges({ () -> Void in
+                        imageData.writeToURL(temporaryFileURL, atomically: true)
+                        PHAssetChangeRequest.creationRequestForAssetFromImageAtFileURL(temporaryFileURL)
+                        
+                        }, completionHandler: { (success: Bool, error: NSError?) -> Void in
+                            if !success {
+                                if let _ = error {
+                                    print("Error occurred while saving image to photo library: \(error)")
+                                } else {
+                                    print("Unknown error occurred while saving image to photo library")
+                                }
+                                
+                                try! NSFileManager.defaultManager().removeItemAtURL(temporaryFileURL)
+                            }
+                    })
+                })
+            })
+        }
     }
     
     func focus(atDevicePoint devicePoint: CGPoint) {

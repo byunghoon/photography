@@ -14,6 +14,7 @@
 		444B25B11B63F3D60056D3E3 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 444B25AF1B63F3D60056D3E3 /* LaunchScreen.xib */; };
 		444B25BD1B63F3D60056D3E3 /* PhotographyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 444B25BC1B63F3D60056D3E3 /* PhotographyTests.swift */; };
 		44825FF31B9230E5002C2D64 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44825FF21B9230E5002C2D64 /* SessionManager.swift */; };
+		44E7D7821B92743E002BD30C /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44E7D7811B92743E002BD30C /* Utility.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +39,7 @@
 		444B25BB1B63F3D60056D3E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		444B25BC1B63F3D60056D3E3 /* PhotographyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotographyTests.swift; sourceTree = "<group>"; };
 		44825FF21B9230E5002C2D64 /* SessionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
+		44E7D7811B92743E002BD30C /* Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +88,7 @@
 				444B25AD1B63F3D60056D3E3 /* Images.xcassets */,
 				444B25AF1B63F3D60056D3E3 /* LaunchScreen.xib */,
 				444B25A41B63F3D60056D3E3 /* Supporting Files */,
+				44E7D7811B92743E002BD30C /* Utility.swift */,
 			);
 			path = Photography;
 			sourceTree = "<group>";
@@ -217,6 +220,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				44E7D7821B92743E002BD30C /* Utility.swift in Sources */,
 				444B25A91B63F3D60056D3E3 /* MainViewController.swift in Sources */,
 				444B25A71B63F3D60056D3E3 /* AppDelegate.swift in Sources */,
 				44825FF31B9230E5002C2D64 /* SessionManager.swift in Sources */,

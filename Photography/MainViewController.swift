@@ -18,6 +18,10 @@ class PreviewView: UIView {
 class MainViewController: UIViewController, SessionManagerDelegate {
     private var sessionManager: SessionManager!
     
+    override func prefersStatusBarHidden() -> Bool {
+        return true
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
