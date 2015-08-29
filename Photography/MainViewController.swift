@@ -16,15 +16,12 @@ class PreviewView: UIView {
 }
 
 class MainViewController: UIViewController, SessionManagerDelegate {
-    private var previewView: PreviewView = PreviewView()
     private var sessionManager: SessionManager!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.addSubview(previewView)
-        
-        sessionManager = SessionManager(previewLayer: previewView.layer as! AVCaptureVideoPreviewLayer)
+        sessionManager = SessionManager(previewLayer: view.layer as! AVCaptureVideoPreviewLayer)
         sessionManager.delegate = self
         
         // disable UI

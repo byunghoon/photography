@@ -124,7 +124,7 @@ class SessionManager: NSObject {
         }
         
         guard let _ = videoDevice else {
-            print("Input device not found")
+            print("Video device not found")
             return
         }
         
