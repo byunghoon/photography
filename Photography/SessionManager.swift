@@ -108,8 +108,8 @@ class SessionManager: NSObject {
     private var currentOutput: AVCaptureStillImageOutput?
     
     private func setupInput(devicePosition preferringDevicePosition: AVCaptureDevicePosition) {
-        if let input = currentInput {
-            session.removeInput(input)
+        if let _ = currentInput {
+            session.removeInput(currentInput)
             currentInput = nil
         }
         
@@ -123,22 +123,23 @@ class SessionManager: NSObject {
             }
         }
         
-        var error: NSError?
-        if let videoDevice = videoDevice, let videoDeviceInput = AVCaptureDeviceInput.deviceInputWithDevice(videoDevice, error: &error) as? AVCaptureDeviceInput where session.canAddInput(videoDeviceInput) {
+        guard let _ = videoDevice else {
+            print("Input device not found")
+            return
+        }
+        
+        if let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice) where session.canAddInput(videoDeviceInput) {
             session.addInput(videoDeviceInput)
             currentInput = videoDeviceInput
             
         } else {
-            println("Could not add video device input to the session")
-            if let error = error {
-                println(error);
-            }
+            print("Could not add video device input to the session")
             status = .ConfigurationFailed
         }
     }
     
     private func setupOutput() {
-        if let output = currentOutput {
+        if let _ = currentOutput {
             session.removeOutput(currentOutput)
             currentOutput = nil
         }
@@ -150,7 +151,7 @@ class SessionManager: NSObject {
             currentOutput = stillImageOutput
             
         } else {
-            println("Could not add still image output to the session")
+            print("Could not add still image output to the session")
             status = .ConfigurationFailed
         }
     }
@@ -182,15 +183,15 @@ class SessionManager: NSObject {
         currentOutput?.removeObserver(self, forKeyPath: kCapturingStillImage, context: CapturingStillImageContext)
     }
     
-    override func observeValueForKeyPath(keyPath: String, ofObject object: AnyObject, change: [NSObject : AnyObject], context: UnsafeMutablePointer<Void>) {
+    override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
         if context == SessionRunningContext {
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                delegate?.sessionManager(self, isCapturingStillImage: change[NSKeyValueChangeNewKey]?.boolValue ?? false)
+                self.delegate?.sessionManager(self, isCapturingStillImage: change?[NSKeyValueChangeNewKey]?.boolValue ?? false)
             })
             
         } else if context == CapturingStillImageContext {
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                delegate?.sessionManager(self, isSessionRunning: change[NSKeyValueChangeNewKey]?.boolValue ?? false)
+                self.delegate?.sessionManager(self, isSessionRunning: change?[NSKeyValueChangeNewKey]?.boolValue ?? false)
             })
             
         } else {
@@ -205,7 +206,7 @@ class SessionManager: NSObject {
     
     func sessionRuntimeError(notification: NSNotification) {
         if let error = notification.userInfo?[AVCaptureSessionErrorKey] as? NSError {
-            println("Capture session runtime error \(error)")
+            print("Capture session runtime error \(error)")
             
             // Automatically try to restart the session running if media services were reset and the last start running succeeded.
             // Otherwise, enable the user to try to resume the session running.
