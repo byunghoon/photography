@@ -6,7 +6,7 @@
 //  Copyright © 2015 Byunghoon. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 class Utility {
     class func getTemporaryFileURL() -> NSURL? {
@@ -15,5 +15,11 @@ class Utility {
         }
         let temporaryFilePath = (NSTemporaryDirectory() as NSString).stringByAppendingPathComponent(temporaryFileName)
         return NSURL.fileURLWithPath(temporaryFilePath)
+    }
+}
+
+class Style {
+    class func iconFont(size: CGFloat) -> UIFont {
+        return UIFont(name: "ionicons", size: size) ?? UIFont.systemFontOfSize(size)
     }
 }

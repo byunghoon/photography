@@ -15,6 +15,7 @@
 		444B25BD1B63F3D60056D3E3 /* PhotographyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 444B25BC1B63F3D60056D3E3 /* PhotographyTests.swift */; };
 		44825FF31B9230E5002C2D64 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44825FF21B9230E5002C2D64 /* SessionManager.swift */; };
 		44E7D7821B92743E002BD30C /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44E7D7811B92743E002BD30C /* Utility.swift */; settings = {ASSET_TAGS = (); }; };
+		44E7D7841B9395CF002BD30C /* ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 44E7D7831B9395CF002BD30C /* ionicons.ttf */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +41,7 @@
 		444B25BC1B63F3D60056D3E3 /* PhotographyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotographyTests.swift; sourceTree = "<group>"; };
 		44825FF21B9230E5002C2D64 /* SessionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		44E7D7811B92743E002BD30C /* Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
+		44E7D7831B9395CF002BD30C /* ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = ionicons.ttf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,8 +89,9 @@
 				444B25AA1B63F3D60056D3E3 /* Main.storyboard */,
 				444B25AD1B63F3D60056D3E3 /* Images.xcassets */,
 				444B25AF1B63F3D60056D3E3 /* LaunchScreen.xib */,
-				444B25A41B63F3D60056D3E3 /* Supporting Files */,
 				44E7D7811B92743E002BD30C /* Utility.swift */,
+				44E7D7851B939785002BD30C /* Assets */,
+				444B25A41B63F3D60056D3E3 /* Supporting Files */,
 			);
 			path = Photography;
 			sourceTree = "<group>";
@@ -116,6 +119,14 @@
 				444B25BB1B63F3D60056D3E3 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		44E7D7851B939785002BD30C /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				44E7D7831B9395CF002BD30C /* ionicons.ttf */,
+			);
+			name = Assets;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -202,6 +213,7 @@
 			files = (
 				444B25AC1B63F3D60056D3E3 /* Main.storyboard in Resources */,
 				444B25B11B63F3D60056D3E3 /* LaunchScreen.xib in Resources */,
+				44E7D7841B9395CF002BD30C /* ionicons.ttf in Resources */,
 				444B25AE1B63F3D60056D3E3 /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
