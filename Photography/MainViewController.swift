@@ -69,11 +69,21 @@ class MainViewController: UIViewController, SessionManagerDelegate {
     }
     
     func sessionManager(sessionManager: SessionManager, isCapturingStillImage: Bool) {
-        //
+        view.layer.opacity = 0
+        UIView.animateWithDuration(0.25) { () -> Void in
+            self.view.layer.opacity = 1
+        }
     }
     
     func sessionManager(sessionManager: SessionManager, isSessionRunning: Bool) {
         //
+    }
+    
+    
+    // MARK: outlets
+    
+    @IBAction func didTapCapture(sender: AnyObject) {
+        sessionManager.snapStillImage()
     }
     
 }

@@ -4,6 +4,11 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8151.3"/>
     </dependencies>
+    <customFonts key="customFonts">
+        <mutableArray key="ionicons.ttf">
+            <string>Ionicons</string>
+        </mutableArray>
+    </customFonts>
     <scenes>
         <!--Main View Controller-->
         <scene sceneID="ufC-wZ-h7g">
@@ -16,7 +21,27 @@
                     <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS" customClass="PreviewView" customModule="Photography" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Boe-cd-zIa">
+                                <rect key="frame" x="255" y="500" width="90" height="90"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="90" id="8iT-hc-1Bg"/>
+                                    <constraint firstAttribute="width" constant="90" id="HyS-Mi-e0F"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="Ionicons" family="Ionicons" pointSize="90"/>
+                                <state key="normal" title="">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="didTapCapture:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="EqD-Qb-9Fr"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="Boe-cd-zIa" firstAttribute="centerX" secondItem="kh9-bI-dsS" secondAttribute="centerX" id="Neq-g3-cjG"/>
+                            <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="Boe-cd-zIa" secondAttribute="bottom" constant="10" id="eFJ-zm-mak"/>
+                        </constraints>
                     </view>
                     <nil key="simulatedStatusBarMetrics"/>
                 </viewController>
