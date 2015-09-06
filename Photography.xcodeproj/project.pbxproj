@@ -14,6 +14,7 @@
 		444B25B11B63F3D60056D3E3 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 444B25AF1B63F3D60056D3E3 /* LaunchScreen.xib */; };
 		444B25BD1B63F3D60056D3E3 /* PhotographyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 444B25BC1B63F3D60056D3E3 /* PhotographyTests.swift */; };
 		44825FF31B9230E5002C2D64 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44825FF21B9230E5002C2D64 /* SessionManager.swift */; };
+		449E22771B9CADB5007EA099 /* ImageComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 449E22761B9CADB5007EA099 /* ImageComposer.swift */; settings = {ASSET_TAGS = (); }; };
 		44E7D7821B92743E002BD30C /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44E7D7811B92743E002BD30C /* Utility.swift */; settings = {ASSET_TAGS = (); }; };
 		44E7D7841B9395CF002BD30C /* ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 44E7D7831B9395CF002BD30C /* ionicons.ttf */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
@@ -40,6 +41,7 @@
 		444B25BB1B63F3D60056D3E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		444B25BC1B63F3D60056D3E3 /* PhotographyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotographyTests.swift; sourceTree = "<group>"; };
 		44825FF21B9230E5002C2D64 /* SessionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
+		449E22761B9CADB5007EA099 /* ImageComposer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageComposer.swift; sourceTree = "<group>"; };
 		44E7D7811B92743E002BD30C /* Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 		44E7D7831B9395CF002BD30C /* ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = ionicons.ttf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -92,6 +94,7 @@
 				44E7D7811B92743E002BD30C /* Utility.swift */,
 				44E7D7851B939785002BD30C /* Assets */,
 				444B25A41B63F3D60056D3E3 /* Supporting Files */,
+				449E22761B9CADB5007EA099 /* ImageComposer.swift */,
 			);
 			path = Photography;
 			sourceTree = "<group>";
@@ -234,6 +237,7 @@
 			files = (
 				44E7D7821B92743E002BD30C /* Utility.swift in Sources */,
 				444B25A91B63F3D60056D3E3 /* MainViewController.swift in Sources */,
+				449E22771B9CADB5007EA099 /* ImageComposer.swift in Sources */,
 				444B25A71B63F3D60056D3E3 /* AppDelegate.swift in Sources */,
 				44825FF31B9230E5002C2D64 /* SessionManager.swift in Sources */,
 			);

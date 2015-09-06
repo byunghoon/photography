@@ -13,12 +13,44 @@ import Photos
 private let SessionRunningContext = UnsafeMutablePointer<Void>()
 private let CapturingStillImageContext = UnsafeMutablePointer<Void>()
 
+typealias ImageCompletion = (success: Bool) -> Void
+
 protocol SessionManagerDelegate {
+    func sessionManager(sessionManager: SessionManager, didFailWithReason reason: FailureReason)
+    
+    func sessionManagerIsReadyForBracketedCapture(sessionManager: SessionManager)
+    
     func sessionManager(sessionManager: SessionManager, shouldUpdateOrientation orientation: UIInterfaceOrientation) //?
-    func sessionManagerDidFailResumption(sessionManager: SessionManager)
     
     func sessionManager(sessionManager: SessionManager, isCapturingStillImage: Bool)
     func sessionManager(sessionManager: SessionManager, isSessionRunning: Bool)
+}
+
+enum FailureReason: String, CustomStringConvertible {
+    case
+    CameraAccessNotAuthorized,
+    PhotosAccessNotAuthorized,
+    
+    CaptureDeviceNotFound,
+    CaptureDeviceCannotBeOpened,
+    CaptureDeviceInputCannotBeAdded,
+    
+    StillImageOutputCannotBeAdded,
+    StillImageOutputDoesNotExist,
+    
+    BracketsCannotBePrepared,
+    
+    ImageTemporaryFileCannotBeCreated,
+    ImageCannotBeSaved,
+    
+    SessionNotConfigured,
+    SessionRuntimeError, // should show resume button (from main queue)
+    
+    Unknown
+    
+    var description: String {
+        return self.rawValue
+    }
 }
 
 class SessionManager: NSObject {
@@ -32,6 +64,11 @@ class SessionManager: NSObject {
     private(set) var isConfigured = false
     private var sessionShouldRun = false
     
+    var exposureBias: Float = 0
+    var bracketSettings: [AVCaptureAutoExposureBracketedStillImageSettings] = []
+    
+    let imageComposer = ImageComposer()
+    
     
     // MARK: session lifecycle
     
@@ -43,6 +80,7 @@ class SessionManager: NSObject {
     func configure() {
         dispatch_async(queue, { () -> Void in
             if !self.isAuthorized {
+                self.failedWithReason(.CameraAccessNotAuthorized)
                 return
             }
             
@@ -51,11 +89,15 @@ class SessionManager: NSObject {
             
             self.session.beginConfiguration()
             
+            if self.session.canSetSessionPreset(AVCaptureSessionPresetPhoto) {
+                self.session.sessionPreset = AVCaptureSessionPresetPhoto
+            }
+            
             // set background recording ID as UIBackgroundTaskInvalid
             
             self.setupInput(devicePosition: .Back)
             
-            // might want to modify previewLayer.connection.videoOrientation from main queue (see line 129 in AAPLCameraViewController.m)
+            // might want to modify previewLayer.connection.videoOrientation from main queue (see line 129 in AAPLCameraViewController.m from AVCam)
             
             self.setupOutput()
             
@@ -65,26 +107,30 @@ class SessionManager: NSObject {
     
     func resume() {
         dispatch_async(queue, { () -> Void in
-            if self.isAuthorized && self.isConfigured {
-                self.addObservers()
-                
-                self.session.startRunning()
-                self.sessionShouldRun = self.session.running
-                
-            } else {
-                self.delegate?.sessionManagerDidFailResumption(self)
+            if !(self.isAuthorized && self.isConfigured) {
+                self.failedWithReason(.SessionNotConfigured)
+                return
             }
+            
+            self.addObservers()
+            
+            self.session.startRunning()
+            self.sessionShouldRun = self.session.running
+            
+            self.prepareBrackets()
         })
     }
     
     func pause() {
         dispatch_async(queue, { () -> Void in
-            if self.isAuthorized && self.isConfigured {
-                self.session.stopRunning()
-                // is self.sessionShouldRun = self.session.running required?
-                
-                self.removeObservers()
+            if !self.isAuthorized && self.isConfigured {
+                return
             }
+            
+            self.session.stopRunning()
+            // is self.sessionShouldRun = self.session.running required?
+            
+            self.removeObservers()
         })
     }
     
@@ -92,62 +138,125 @@ class SessionManager: NSObject {
     // MARK: camera
     
     func changeCamera() {
-        
     }
     
     func snapStillImage() {
-        dispatch_async(queue) { () -> Void in
-            guard let stillImageOutput = self.currentOutput else {
-                print("Still image output does not exist")
-                return
-            }
-            
-            let connection = stillImageOutput.connectionWithMediaType(AVMediaTypeVideo)
-            connection.videoOrientation = self.previewLayer.connection.videoOrientation
-            
-            // might want to update flash settings (see line 558 in AAPLCameraViewController.m)
-            
-            stillImageOutput.captureStillImageAsynchronouslyFromConnection(connection, completionHandler: { (imageDataSampleBuffer: CMSampleBuffer!, error: NSError!) -> Void in
-                // The sample buffer is not retained. Create image data before saving the still image to the photo library asynchronously.
-                let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(imageDataSampleBuffer)
-                PHPhotoLibrary.requestAuthorization({ (status: PHAuthorizationStatus) -> Void in
-                    if status != .Authorized {
-                        print("Access to camera roll is not authorized")
-                        return
-                    }
-                    
-                    // TODO: iOS9 - use PHAssetCreationRequest.addResourceWithType() instead
-                    // see line 569 in AAPLCameraViewController.m
-                    
-                    guard let temporaryFileURL = Utility.getTemporaryFileURL() else {
-                        print("Unable to create temporary file name")
-                        return
-                    }
-                    
-                    PHPhotoLibrary.sharedPhotoLibrary().performChanges({ () -> Void in
-                        imageData.writeToURL(temporaryFileURL, atomically: true)
-                        PHAssetChangeRequest.creationRequestForAssetFromImageAtFileURL(temporaryFileURL)
-                        
-                        }, completionHandler: { (success: Bool, error: NSError?) -> Void in
-                            if !success {
-                                if let _ = error {
-                                    print("Error occurred while saving image to photo library: \(error)")
-                                } else {
-                                    print("Unknown error occurred while saving image to photo library")
-                                }
-                                
-                                try! NSFileManager.defaultManager().removeItemAtURL(temporaryFileURL)
-                            }
-                    })
-                })
+        dispatch_async(queue, { () -> Void in
+            //self.performSingleCapture()
+            self.performBracketedCapture({ (success) -> Void in
+                //
             })
-        }
+        })
     }
     
     func focus(atDevicePoint devicePoint: CGPoint) {
         
     }
     
+    
+    // MARK: helper
+    
+    func failedWithReason(reason: FailureReason) {
+        delegate?.sessionManager(self, didFailWithReason: reason)
+        isConfigured = false
+    }
+    
+    
+    // MARK: in-queue operation
+    
+    func prepareBrackets() {
+        guard let stillImageOutput = currentOutput else {
+            failedWithReason(.StillImageOutputDoesNotExist)
+            return
+        }
+        
+        let connection = stillImageOutput.connectionWithMediaType(AVMediaTypeVideo)
+        connection.videoOrientation = previewLayer.connection.videoOrientation
+        
+        for var i = 0; i < stillImageOutput.maxBracketedCaptureStillImageCount; i++ {
+            bracketSettings.append(AVCaptureAutoExposureBracketedStillImageSettings.autoExposureSettingsWithExposureTargetBias(exposureBias))
+        }
+        
+        stillImageOutput.prepareToCaptureStillImageBracketFromConnection(connection, withSettingsArray: bracketSettings, completionHandler: { (prepared: Bool, error: NSError!) -> Void in
+            if prepared {
+                print("Successfully prepared brackets (max: \(stillImageOutput.maxBracketedCaptureStillImageCount))")
+                self.delegate?.sessionManagerIsReadyForBracketedCapture(self)
+                
+            } else {
+                self.failedWithReason(.BracketsCannotBePrepared)
+            }
+        })
+    }
+    
+    func performBracketedCapture(completion: ImageCompletion) {
+        guard let stillImageOutput = currentOutput else {
+            failedWithReason(.StillImageOutputDoesNotExist)
+            return
+        }
+        
+        let connection = stillImageOutput.connectionWithMediaType(AVMediaTypeVideo)
+        connection.videoOrientation = previewLayer.connection.videoOrientation
+        
+        stillImageOutput.captureStillImageBracketAsynchronouslyFromConnection(connection, withSettingsArray: bracketSettings) { (sampleBuffer: CMSampleBuffer!, stillImageSettings: AVCaptureBracketedStillImageSettings!, error: NSError!) -> Void in
+            let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer)
+            print("captured!")
+            self.saveImage(imageData)
+        }
+    }
+    
+    func performSingleCapture() {
+        guard let stillImageOutput = self.currentOutput else {
+            self.failedWithReason(.StillImageOutputDoesNotExist)
+            return
+        }
+        
+        let connection = stillImageOutput.connectionWithMediaType(AVMediaTypeVideo)
+        connection.videoOrientation = self.previewLayer.connection.videoOrientation
+        
+        // might want to update flash settings (see line 558 in AAPLCameraViewController.m from AVCam)
+        
+        stillImageOutput.captureStillImageAsynchronouslyFromConnection(connection, completionHandler: { (imageDataSampleBuffer: CMSampleBuffer!, error: NSError!) -> Void in
+            // The sample buffer is not retained. Create image data before saving the still image to the photo library asynchronously.
+            let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(imageDataSampleBuffer)
+            self.saveImage(imageData)
+        })
+    }
+    
+    func saveImage(imageData: NSData) {
+        PHPhotoLibrary.requestAuthorization({ (status: PHAuthorizationStatus) -> Void in
+            if status != .Authorized {
+                self.failedWithReason(.PhotosAccessNotAuthorized)
+                return
+            }
+            
+            // TODO: iOS9 - use PHAssetCreationRequest.addResourceWithType() instead
+            // see line 569 in AAPLCameraViewController.m from AVCam
+            
+            guard let temporaryFileURL = Utility.getTemporaryFileURL() else {
+                self.failedWithReason(.ImageTemporaryFileCannotBeCreated)
+                return
+            }
+            
+            PHPhotoLibrary.sharedPhotoLibrary().performChanges({ () -> Void in
+                imageData.writeToURL(temporaryFileURL, atomically: true)
+                PHAssetChangeRequest.creationRequestForAssetFromImageAtFileURL(temporaryFileURL)
+                
+                }, completionHandler: { (success: Bool, error: NSError?) -> Void in
+                    if !success {
+                        if let _ = error {
+                            self.failedWithReason(.ImageCannotBeSaved)
+                            print("Error occurred while saving image to photo library: \(error)")
+                            
+                        } else {
+                            self.failedWithReason(.Unknown)
+                        }
+                        
+                        try! NSFileManager.defaultManager().removeItemAtURL(temporaryFileURL)
+                    }
+            })
+        })
+    }
+
     
     // MARK: I/O setup
     
@@ -171,17 +280,21 @@ class SessionManager: NSObject {
         }
         
         guard let _ = videoDevice else {
-            print("Video device not found")
+            self.failedWithReason(.CaptureDeviceNotFound)
             return
         }
         
-        if let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice) where session.canAddInput(videoDeviceInput) {
-            session.addInput(videoDeviceInput)
-            currentInput = videoDeviceInput
+        if let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice) {
+            if session.canAddInput(videoDeviceInput) {
+                session.addInput(videoDeviceInput)
+                currentInput = videoDeviceInput
+                
+            } else {
+                self.failedWithReason(.CaptureDeviceInputCannotBeAdded)
+            }
             
         } else {
-            print("Could not add video device input to the session")
-            isConfigured = false
+            self.failedWithReason(.CaptureDeviceCannotBeOpened)
         }
     }
     
@@ -198,8 +311,7 @@ class SessionManager: NSObject {
             currentOutput = stillImageOutput
             
         } else {
-            print("Could not add still image output to the session")
-            isConfigured = false
+            self.failedWithReason(.StillImageOutputCannotBeAdded)
         }
     }
     
@@ -264,13 +376,13 @@ class SessionManager: NSObject {
                         self.sessionShouldRun = self.session.running
                         
                     } else {
-                        // show resume button (from main queue)
+                        self.failedWithReason(.SessionRuntimeError)
                     }
                 })
             }
             
         } else {
-            // show resume button (from main queue)
+            self.failedWithReason(.SessionRuntimeError)
         }
     }
     

@@ -23,12 +23,12 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Boe-cd-zIa">
-                                <rect key="frame" x="255" y="500" width="90" height="90"/>
+                                <rect key="frame" x="260" y="510" width="80" height="80"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="90" id="8iT-hc-1Bg"/>
-                                    <constraint firstAttribute="width" constant="90" id="HyS-Mi-e0F"/>
+                                    <constraint firstAttribute="height" constant="80" id="8iT-hc-1Bg"/>
+                                    <constraint firstAttribute="width" constant="80" id="HyS-Mi-e0F"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" name="Ionicons" family="Ionicons" pointSize="90"/>
+                                <fontDescription key="fontDescription" name="Ionicons" family="Ionicons" pointSize="80"/>
                                 <state key="normal" title="">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -44,6 +44,9 @@
                         </constraints>
                     </view>
                     <nil key="simulatedStatusBarMetrics"/>
+                    <connections>
+                        <outlet property="shutterButton" destination="Boe-cd-zIa" id="r6K-AM-vFw"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>

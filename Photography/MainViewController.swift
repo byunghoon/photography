@@ -18,6 +18,14 @@ class PreviewView: UIView {
 class MainViewController: UIViewController, SessionManagerDelegate {
     private var sessionManager: SessionManager!
     
+    private var userInterfaceEnabled: Bool = false {
+        didSet {
+            shutterButton.enabled = userInterfaceEnabled
+        }
+    }
+    
+    @IBOutlet private weak var shutterButton: UIButton!
+    
     override func prefersStatusBarHidden() -> Bool {
         return true
     }
@@ -28,8 +36,7 @@ class MainViewController: UIViewController, SessionManagerDelegate {
         sessionManager = SessionManager(previewLayer: view.layer as! AVCaptureVideoPreviewLayer)
         sessionManager.delegate = self
         
-        // disable UI
-        // ...
+        userInterfaceEnabled = false
         
         switch AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo) {
         case .Authorized:
@@ -62,12 +69,17 @@ class MainViewController: UIViewController, SessionManagerDelegate {
     
     // MARK: session manager delegate
     
-    func sessionManager(sessionManager: SessionManager, shouldUpdateOrientation orientation: UIInterfaceOrientation) {
-        //
+    func sessionManager(sessionManager: SessionManager, didFailWithReason reason: FailureReason) {
+        userInterfaceEnabled = false
+        presentViewController(UIAlertController(title: "Session resumption failed", message: reason.description, preferredStyle: UIAlertControllerStyle.Alert), animated: true, completion: nil)
     }
     
-    func sessionManagerDidFailResumption(sessionManager: SessionManager) {
-        presentViewController(UIAlertController(title: "Session resumption failed", message: nil, preferredStyle: UIAlertControllerStyle.Alert), animated: true, completion: nil)
+    func sessionManagerIsReadyForBracketedCapture(sessionManager: SessionManager) {
+        userInterfaceEnabled = true
+    }
+    
+    func sessionManager(sessionManager: SessionManager, shouldUpdateOrientation orientation: UIInterfaceOrientation) {
+        //
     }
     
     func sessionManager(sessionManager: SessionManager, isCapturingStillImage: Bool) {
