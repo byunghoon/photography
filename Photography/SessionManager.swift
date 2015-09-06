@@ -53,6 +53,10 @@ enum FailureReason: String, CustomStringConvertible {
     }
 }
 
+private struct SessionConfiguration {
+    static let maxBracketedImageCount = 5
+}
+
 class SessionManager: NSObject {
     private let session = AVCaptureSession()
     let queue = dispatch_queue_create("queue", DISPATCH_QUEUE_SERIAL)
@@ -156,7 +160,7 @@ class SessionManager: NSObject {
     
     // MARK: helper
     
-    func failedWithReason(reason: FailureReason) {
+    private func failedWithReason(reason: FailureReason) {
         delegate?.sessionManager(self, didFailWithReason: reason)
         isConfigured = false
     }
@@ -164,7 +168,7 @@ class SessionManager: NSObject {
     
     // MARK: in-queue operation
     
-    func prepareBrackets() {
+    private func prepareBrackets() {
         guard let stillImageOutput = currentOutput else {
             failedWithReason(.StillImageOutputDoesNotExist)
             return
@@ -173,13 +177,13 @@ class SessionManager: NSObject {
         let connection = stillImageOutput.connectionWithMediaType(AVMediaTypeVideo)
         connection.videoOrientation = previewLayer.connection.videoOrientation
         
-        for var i = 0; i < stillImageOutput.maxBracketedCaptureStillImageCount; i++ {
+        for var i = 0; i < min(SessionConfiguration.maxBracketedImageCount, stillImageOutput.maxBracketedCaptureStillImageCount); i++ {
             bracketSettings.append(AVCaptureAutoExposureBracketedStillImageSettings.autoExposureSettingsWithExposureTargetBias(exposureBias))
         }
         
         stillImageOutput.prepareToCaptureStillImageBracketFromConnection(connection, withSettingsArray: bracketSettings, completionHandler: { (prepared: Bool, error: NSError!) -> Void in
             if prepared {
-                print("Successfully prepared brackets (max: \(stillImageOutput.maxBracketedCaptureStillImageCount))")
+                print("Successfully prepared brackets (max: \(stillImageOutput.maxBracketedCaptureStillImageCount), actual: \(self.bracketSettings.count))")
                 self.delegate?.sessionManagerIsReadyForBracketedCapture(self)
                 
             } else {
@@ -188,7 +192,7 @@ class SessionManager: NSObject {
         })
     }
     
-    func performBracketedCapture(completion: ImageCompletion) {
+    private func performBracketedCapture(completion: ImageCompletion) {
         guard let stillImageOutput = currentOutput else {
             failedWithReason(.StillImageOutputDoesNotExist)
             return
@@ -197,14 +201,18 @@ class SessionManager: NSObject {
         let connection = stillImageOutput.connectionWithMediaType(AVMediaTypeVideo)
         connection.videoOrientation = previewLayer.connection.videoOrientation
         
+        var numberOfWaitingBrackets = bracketSettings.count
+        var failure = false
+        
         stillImageOutput.captureStillImageBracketAsynchronouslyFromConnection(connection, withSettingsArray: bracketSettings) { (sampleBuffer: CMSampleBuffer!, stillImageSettings: AVCaptureBracketedStillImageSettings!, error: NSError!) -> Void in
+            
             let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer)
             print("captured!")
             self.saveImage(imageData)
         }
     }
     
-    func performSingleCapture() {
+    private func performSingleCapture() {
         guard let stillImageOutput = self.currentOutput else {
             self.failedWithReason(.StillImageOutputDoesNotExist)
             return
@@ -222,7 +230,7 @@ class SessionManager: NSObject {
         })
     }
     
-    func saveImage(imageData: NSData) {
+    private func saveImage(imageData: NSData) {
         PHPhotoLibrary.requestAuthorization({ (status: PHAuthorizationStatus) -> Void in
             if status != .Authorized {
                 self.failedWithReason(.PhotosAccessNotAuthorized)
