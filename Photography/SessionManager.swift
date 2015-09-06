@@ -13,27 +13,24 @@ import Photos
 private let SessionRunningContext = UnsafeMutablePointer<Void>()
 private let CapturingStillImageContext = UnsafeMutablePointer<Void>()
 
-enum SessionStatus {
-    case Success, NotAuthorized, ConfigurationFailed
-}
-
 protocol SessionManagerDelegate {
     func sessionManager(sessionManager: SessionManager, shouldUpdateOrientation orientation: UIInterfaceOrientation) //?
-    func sessionManager(sessionManager: SessionManager, didFailResumptionWithStatus: SessionStatus)
+    func sessionManagerDidFailResumption(sessionManager: SessionManager)
     
     func sessionManager(sessionManager: SessionManager, isCapturingStillImage: Bool)
     func sessionManager(sessionManager: SessionManager, isSessionRunning: Bool)
 }
 
 class SessionManager: NSObject {
-    let session = AVCaptureSession()
+    private let session = AVCaptureSession()
     let queue = dispatch_queue_create("queue", DISPATCH_QUEUE_SERIAL)
     
     let previewLayer: AVCaptureVideoPreviewLayer
     var delegate: SessionManagerDelegate?
     
-    var status: SessionStatus = .NotAuthorized
-    var sessionShouldRun = false
+    var isAuthorized = false
+    private(set) var isConfigured = false
+    private var sessionShouldRun = false
     
     
     // MARK: session lifecycle
@@ -45,9 +42,14 @@ class SessionManager: NSObject {
     
     func configure() {
         dispatch_async(queue, { () -> Void in
-            if self.status != .Success {
+            if !self.isAuthorized {
                 return
             }
+            
+            // TODO: better way to set isConfigured
+            self.isConfigured = true
+            
+            self.session.beginConfiguration()
             
             // set background recording ID as UIBackgroundTaskInvalid
             
@@ -63,22 +65,21 @@ class SessionManager: NSObject {
     
     func resume() {
         dispatch_async(queue, { () -> Void in
-            switch (self.status) {
-            case .Success:
+            if self.isAuthorized && self.isConfigured {
                 self.addObservers()
                 
                 self.session.startRunning()
                 self.sessionShouldRun = self.session.running
                 
-            default:
-                self.delegate?.sessionManager(self, didFailResumptionWithStatus: self.status)
+            } else {
+                self.delegate?.sessionManagerDidFailResumption(self)
             }
         })
     }
     
     func pause() {
         dispatch_async(queue, { () -> Void in
-            if self.status == .Success {
+            if self.isAuthorized && self.isConfigured {
                 self.session.stopRunning()
                 // is self.sessionShouldRun = self.session.running required?
                 
@@ -180,7 +181,7 @@ class SessionManager: NSObject {
             
         } else {
             print("Could not add video device input to the session")
-            status = .ConfigurationFailed
+            isConfigured = false
         }
     }
     
@@ -198,7 +199,7 @@ class SessionManager: NSObject {
             
         } else {
             print("Could not add still image output to the session")
-            status = .ConfigurationFailed
+            isConfigured = false
         }
     }
     

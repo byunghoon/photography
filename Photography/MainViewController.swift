@@ -33,15 +33,17 @@ class MainViewController: UIViewController, SessionManagerDelegate {
         
         switch AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo) {
         case .Authorized:
-            sessionManager.status = .Success
+            sessionManager.isAuthorized = true
+            
         case .NotDetermined:
             dispatch_suspend(sessionManager.queue)
             AVCaptureDevice.requestAccessForMediaType(AVMediaTypeVideo, completionHandler: { (granted: Bool) -> Void in
-                self.sessionManager.status = granted ? .Success : .NotAuthorized
+                self.sessionManager.isAuthorized = granted
                 dispatch_resume(self.sessionManager.queue)
             })
+            
         default:
-            sessionManager.status = .NotAuthorized
+            sessionManager.isAuthorized = false
         }
         
         sessionManager.configure()
@@ -64,7 +66,7 @@ class MainViewController: UIViewController, SessionManagerDelegate {
         //
     }
     
-    func sessionManager(sessionManager: SessionManager, didFailResumptionWithStatus: SessionStatus) {
+    func sessionManagerDidFailResumption(sessionManager: SessionManager) {
         presentViewController(UIAlertController(title: "Session resumption failed", message: nil, preferredStyle: UIAlertControllerStyle.Alert), animated: true, completion: nil)
     }
     
