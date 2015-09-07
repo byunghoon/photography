@@ -39,7 +39,7 @@ enum FailureReason: String, CustomStringConvertible {
     StillImageOutputDoesNotExist,
     
     BracketsCannotBePrepared,
-    BracketedCaptureRequestUnsuccessful,
+    BracketedCaptureContainsNullBuffer,
     
     ImageTemporaryFileCannotBeCreated,
     ImageCannotBeSaved,
@@ -223,7 +223,7 @@ class SessionManager: NSObject {
                     if numberOfWaitingBrackets == 0 {
                         if let _ = oneOfTheErrors {
                             print(oneOfTheErrors)
-                            self.failedWithReason(.BracketedCaptureRequestUnsuccessful)
+                            self.failedWithReason(.BracketedCaptureContainsNullBuffer)
                             return
                         }
                         
