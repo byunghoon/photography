@@ -6,7 +6,7 @@
 //  Copyright © 2015 Byunghoon. All rights reserved.
 //
 
-#import "MedianBlendingFilter.h"
+#import "GPUImageMedianBlendingFilter.h"
 
 NSString *const kMedianBlendingFragmentShaderString = SHADER_STRING
 (
@@ -32,7 +32,7 @@ NSString *const kMedianBlendingFragmentShaderString = SHADER_STRING
  }
 );
 
-@implementation MedianBlendingFilter
+@implementation GPUImageMedianBlendingFilter
 
 #pragma mark -
 #pragma mark Initialization and teardown

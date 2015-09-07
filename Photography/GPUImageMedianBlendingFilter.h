@@ -8,6 +8,6 @@
 
 #import "GPUImageThreeInputFilter.h"
 
-@interface MedianBlendingFilter : GPUImageThreeInputFilter
+@interface GPUImageMedianBlendingFilter : GPUImageThreeInputFilter
 
 @end
