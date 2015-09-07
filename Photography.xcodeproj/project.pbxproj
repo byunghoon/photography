@@ -16,6 +16,7 @@
 		444B25BD1B63F3D60056D3E3 /* PhotographyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 444B25BC1B63F3D60056D3E3 /* PhotographyTests.swift */; };
 		44825FF31B9230E5002C2D64 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44825FF21B9230E5002C2D64 /* SessionManager.swift */; };
 		449E22771B9CADB5007EA099 /* ImageComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 449E22761B9CADB5007EA099 /* ImageComposer.swift */; };
+		449E227B1B9CF6B8007EA099 /* MedianBlendingFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 449E227A1B9CF6B8007EA099 /* MedianBlendingFilter.m */; settings = {ASSET_TAGS = (); }; };
 		44E7D7821B92743E002BD30C /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44E7D7811B92743E002BD30C /* Utility.swift */; };
 		44E7D7841B9395CF002BD30C /* ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 44E7D7831B9395CF002BD30C /* ionicons.ttf */; };
 /* End PBXBuildFile section */
@@ -45,6 +46,9 @@
 		444B25BC1B63F3D60056D3E3 /* PhotographyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotographyTests.swift; sourceTree = "<group>"; };
 		44825FF21B9230E5002C2D64 /* SessionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		449E22761B9CADB5007EA099 /* ImageComposer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageComposer.swift; sourceTree = "<group>"; };
+		449E22781B9CF6B8007EA099 /* Photography-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Photography-Bridging-Header.h"; sourceTree = "<group>"; };
+		449E22791B9CF6B8007EA099 /* MedianBlendingFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MedianBlendingFilter.h; sourceTree = "<group>"; };
+		449E227A1B9CF6B8007EA099 /* MedianBlendingFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MedianBlendingFilter.m; sourceTree = "<group>"; };
 		44E7D7811B92743E002BD30C /* Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 		44E7D7831B9395CF002BD30C /* ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = ionicons.ttf; sourceTree = "<group>"; };
 		455DB664F54474DB4CE5C93D /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
@@ -92,16 +96,18 @@
 		444B25A31B63F3D60056D3E3 /* Photography */ = {
 			isa = PBXGroup;
 			children = (
-				444B25A61B63F3D60056D3E3 /* AppDelegate.swift */,
+				449E227C1B9CF6E7007EA099 /* Custom Filters */,
 				444B25A81B63F3D60056D3E3 /* MainViewController.swift */,
 				44825FF21B9230E5002C2D64 /* SessionManager.swift */,
-				444B25AA1B63F3D60056D3E3 /* Main.storyboard */,
-				444B25AD1B63F3D60056D3E3 /* Images.xcassets */,
-				444B25AF1B63F3D60056D3E3 /* LaunchScreen.xib */,
+				449E22761B9CADB5007EA099 /* ImageComposer.swift */,
 				44E7D7811B92743E002BD30C /* Utility.swift */,
+				444B25A61B63F3D60056D3E3 /* AppDelegate.swift */,
+				449E22781B9CF6B8007EA099 /* Photography-Bridging-Header.h */,
+				444B25AA1B63F3D60056D3E3 /* Main.storyboard */,
+				444B25AF1B63F3D60056D3E3 /* LaunchScreen.xib */,
+				444B25AD1B63F3D60056D3E3 /* Images.xcassets */,
 				44E7D7851B939785002BD30C /* Assets */,
 				444B25A41B63F3D60056D3E3 /* Supporting Files */,
-				449E22761B9CADB5007EA099 /* ImageComposer.swift */,
 			);
 			path = Photography;
 			sourceTree = "<group>";
@@ -129,6 +135,15 @@
 				444B25BB1B63F3D60056D3E3 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		449E227C1B9CF6E7007EA099 /* Custom Filters */ = {
+			isa = PBXGroup;
+			children = (
+				449E22791B9CF6B8007EA099 /* MedianBlendingFilter.h */,
+				449E227A1B9CF6B8007EA099 /* MedianBlendingFilter.m */,
+			);
+			name = "Custom Filters";
 			sourceTree = "<group>";
 		};
 		44E7D7851B939785002BD30C /* Assets */ = {
@@ -294,6 +309,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				449E227B1B9CF6B8007EA099 /* MedianBlendingFilter.m in Sources */,
 				44E7D7821B92743E002BD30C /* Utility.swift in Sources */,
 				444B25A91B63F3D60056D3E3 /* MainViewController.swift in Sources */,
 				449E22771B9CADB5007EA099 /* ImageComposer.swift in Sources */,
@@ -427,10 +443,13 @@
 			baseConfigurationReference = 455DB664F54474DB4CE5C93D /* Pods.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = Photography/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "bh.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Photography/Photography-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -439,10 +458,12 @@
 			baseConfigurationReference = 3BAB0835282C4BF5C2CBB7E3 /* Pods.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = Photography/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "bh.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Photography/Photography-Bridging-Header.h";
 			};
 			name = Release;
 		};

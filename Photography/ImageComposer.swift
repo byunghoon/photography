@@ -11,8 +11,12 @@ import AVFoundation
 //import Photos
 
 class ImageComposer: NSObject {
+    let images: [UIImage] = []
+    
     func addSampleBuffer(sampleBuffer: CMSampleBufferRef) {
-        
+        let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer)
+        images.append(<#T##newElement: UIImage##UIImage#>)
+
     }
     
     func process() {

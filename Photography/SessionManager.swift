@@ -54,7 +54,7 @@ enum FailureReason: String, CustomStringConvertible {
 }
 
 private struct SessionConfiguration {
-    static let maxBracketedImageCount = 5
+    static let maxBracketedImageCount = 3
 }
 
 class SessionManager: NSObject {
