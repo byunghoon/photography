@@ -11,15 +11,30 @@ import AVFoundation
 //import Photos
 
 class ImageComposer: NSObject {
-    let images: [UIImage] = []
+    private var pictures: [GPUImagePicture] = []
     
     func addSampleBuffer(sampleBuffer: CMSampleBufferRef) {
         let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer)
-        images.append(<#T##newElement: UIImage##UIImage#>)
-
+        let image = UIImage(data: imageData)
+        let picture = GPUImagePicture(image: image)
+        pictures.append(picture)
     }
     
-    func process() {
+    func process() -> UIImage {
+        let filter = MedianBlendingFilter()
         
+        for var i = 0; i < pictures.count; i++ {
+            pictures[i].addTarget(filter, atTextureLocation: i)
+        }
+        
+        for var i = 0; i < pictures.count; i++ {
+            pictures[i].processImage()
+        }
+        
+        return filter.imageFromCurrentFramebuffer()
+    }
+    
+    func reset() {
+        pictures.removeAll(keepCapacity: true)
     }
 }

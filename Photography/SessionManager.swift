@@ -204,11 +204,20 @@ class SessionManager: NSObject {
         var numberOfWaitingBrackets = bracketSettings.count
         var failure = false
         
+        imageComposer.reset()
+        
         stillImageOutput.captureStillImageBracketAsynchronouslyFromConnection(connection, withSettingsArray: bracketSettings) { (sampleBuffer: CMSampleBuffer!, stillImageSettings: AVCaptureBracketedStillImageSettings!, error: NSError!) -> Void in
+            numberOfWaitingBrackets--
             
-            let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer)
-            print("captured!")
-            self.saveImage(imageData)
+            self.imageComposer.addSampleBuffer(sampleBuffer)
+            
+            if numberOfWaitingBrackets == 0 {
+                let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer)
+                self.saveImage(imageData)
+                
+                let composedImage = self.imageComposer.process()
+                self.saveImage(UIImageJPEGRepresentation(composedImage, 1))
+            }
         }
     }
     
