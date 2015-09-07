@@ -8,6 +8,12 @@
 
 import UIKit
 
-class MedianBlendingFilter: CIFilter {
+static let medianBlendingKernel: String = nil
 
+class MedianBlendingFilter: CIFilter {
+    var inputImage0: CIImage!
+    var inputImage1: CIImage!
+    var inputImage2: CIImage!
+    
+    
 }

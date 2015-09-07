@@ -39,6 +39,7 @@ enum FailureReason: String, CustomStringConvertible {
     StillImageOutputDoesNotExist,
     
     BracketsCannotBePrepared,
+    BracketedCaptureRequestUnsuccessful,
     
     ImageTemporaryFileCannotBeCreated,
     ImageCannotBeSaved,
@@ -202,22 +203,37 @@ class SessionManager: NSObject {
         connection.videoOrientation = previewLayer.connection.videoOrientation
         
         var numberOfWaitingBrackets = bracketSettings.count
-        var failure = false
+        var oneOfTheErrors: NSError? = nil
         
         imageComposer.reset()
         
         stillImageOutput.captureStillImageBracketAsynchronouslyFromConnection(connection, withSettingsArray: bracketSettings) { (sampleBuffer: CMSampleBuffer!, stillImageSettings: AVCaptureBracketedStillImageSettings!, error: NSError!) -> Void in
             numberOfWaitingBrackets--
             
-            self.imageComposer.addSampleBuffer(sampleBuffer)
-            
-            if numberOfWaitingBrackets == 0 {
+            var currentImageData: NSData?
+            ObjcUtility.tryBlock({ () -> Void in
                 let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer)
-                self.saveImage(imageData)
+                self.imageComposer.addImageData(imageData)
+                currentImageData = imageData
                 
-                let composedImage = self.imageComposer.process()
-                self.saveImage(UIImageJPEGRepresentation(composedImage, 1))
-            }
+                }, catchBlock: { (exception: NSException!) -> Void in
+                    oneOfTheErrors = error
+                    
+                }, finallyBlock: { () -> Void in
+                    if numberOfWaitingBrackets == 0 {
+                        if let _ = oneOfTheErrors {
+                            print(oneOfTheErrors)
+                            self.failedWithReason(.BracketedCaptureRequestUnsuccessful)
+                            return
+                        }
+                        
+                        if let imageData = currentImageData {
+                            self.saveImage(imageData)
+                        }
+                        
+                        self.saveImage(self.imageComposer.process())
+                    }
+            })
         }
     }
     
