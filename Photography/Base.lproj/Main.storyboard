@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="8187.4" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="8191" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8151.3"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
     </dependencies>
     <customFonts key="customFonts">
         <mutableArray key="ionicons.ttf">
@@ -36,19 +37,38 @@
                                     <action selector="didTapCapture:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="EqD-Qb-9Fr"/>
                                 </connections>
                             </button>
+                            <imageView hidden="YES" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="0tw-dv-Yph">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="800"/>
+                                <gestureRecognizers/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="0tw-dv-Yph" secondAttribute="height" multiplier="3:4" id="LuT-5C-to3"/>
+                                </constraints>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="aNa-P0-c7H" appends="YES" id="AxG-8h-Ysj"/>
+                                </connections>
+                            </imageView>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstAttribute="trailing" secondItem="0tw-dv-Yph" secondAttribute="trailing" id="6Yj-6s-pld"/>
+                            <constraint firstItem="0tw-dv-Yph" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" id="HDu-c0-mf5"/>
                             <constraint firstItem="Boe-cd-zIa" firstAttribute="centerX" secondItem="kh9-bI-dsS" secondAttribute="centerX" id="Neq-g3-cjG"/>
                             <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="Boe-cd-zIa" secondAttribute="bottom" constant="10" id="eFJ-zm-mak"/>
+                            <constraint firstItem="0tw-dv-Yph" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="fCa-5F-kpG"/>
                         </constraints>
                     </view>
                     <nil key="simulatedStatusBarMetrics"/>
                     <connections>
+                        <outlet property="previewImageView" destination="0tw-dv-Yph" id="dbN-fS-pc8"/>
                         <outlet property="shutterButton" destination="Boe-cd-zIa" id="r6K-AM-vFw"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
+                <pongPressGestureRecognizer allowableMovement="400" minimumPressDuration="0.0" id="aNa-P0-c7H">
+                    <connections>
+                        <action selector="didLongPressPreview:" destination="vXZ-lx-hvc" id="gwD-k4-9Ov"/>
+                    </connections>
+                </pongPressGestureRecognizer>
             </objects>
         </scene>
     </scenes>

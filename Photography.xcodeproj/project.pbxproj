@@ -14,11 +14,13 @@
 		444B25AE1B63F3D60056D3E3 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 444B25AD1B63F3D60056D3E3 /* Images.xcassets */; };
 		444B25B11B63F3D60056D3E3 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 444B25AF1B63F3D60056D3E3 /* LaunchScreen.xib */; };
 		444B25BD1B63F3D60056D3E3 /* PhotographyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 444B25BC1B63F3D60056D3E3 /* PhotographyTests.swift */; };
+		446CE6E21BA1163800DAF5EC /* MedianBlendingSampler.cikernel in Resources */ = {isa = PBXBuildFile; fileRef = 446CE6E11BA1163800DAF5EC /* MedianBlendingSampler.cikernel */; settings = {ASSET_TAGS = (); }; };
 		44825FF31B9230E5002C2D64 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44825FF21B9230E5002C2D64 /* SessionManager.swift */; };
 		4490614C1B9D8DF800D3EFE0 /* ObjcUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 4490614B1B9D8DF800D3EFE0 /* ObjcUtility.m */; settings = {ASSET_TAGS = (); }; };
 		4490614F1B9D92EA00D3EFE0 /* MedianBlendingFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4490614E1B9D92EA00D3EFE0 /* MedianBlendingFilter.swift */; settings = {ASSET_TAGS = (); }; };
 		449E22771B9CADB5007EA099 /* ImageComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 449E22761B9CADB5007EA099 /* ImageComposer.swift */; };
 		449E227B1B9CF6B8007EA099 /* GPUImageMedianBlendingFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 449E227A1B9CF6B8007EA099 /* GPUImageMedianBlendingFilter.m */; settings = {ASSET_TAGS = (); }; };
+		44E3452D1BA0FFCC006CE14C /* MedianBlending.cikernel in Resources */ = {isa = PBXBuildFile; fileRef = 44E3452C1BA0FFCC006CE14C /* MedianBlending.cikernel */; settings = {ASSET_TAGS = (); }; };
 		44E7D7821B92743E002BD30C /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44E7D7811B92743E002BD30C /* Utility.swift */; };
 		44E7D7841B9395CF002BD30C /* ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 44E7D7831B9395CF002BD30C /* ionicons.ttf */; };
 /* End PBXBuildFile section */
@@ -46,6 +48,7 @@
 		444B25B61B63F3D60056D3E3 /* PhotographyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhotographyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		444B25BB1B63F3D60056D3E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		444B25BC1B63F3D60056D3E3 /* PhotographyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotographyTests.swift; sourceTree = "<group>"; };
+		446CE6E11BA1163800DAF5EC /* MedianBlendingSampler.cikernel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MedianBlendingSampler.cikernel; sourceTree = "<group>"; };
 		44825FF21B9230E5002C2D64 /* SessionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		4490614A1B9D8DF800D3EFE0 /* ObjcUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObjcUtility.h; sourceTree = "<group>"; };
 		4490614B1B9D8DF800D3EFE0 /* ObjcUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjcUtility.m; sourceTree = "<group>"; };
@@ -54,6 +57,7 @@
 		449E22781B9CF6B8007EA099 /* Photography-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Photography-Bridging-Header.h"; sourceTree = "<group>"; };
 		449E22791B9CF6B8007EA099 /* GPUImageMedianBlendingFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPUImageMedianBlendingFilter.h; sourceTree = "<group>"; };
 		449E227A1B9CF6B8007EA099 /* GPUImageMedianBlendingFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPUImageMedianBlendingFilter.m; sourceTree = "<group>"; };
+		44E3452C1BA0FFCC006CE14C /* MedianBlending.cikernel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MedianBlending.cikernel; sourceTree = "<group>"; };
 		44E7D7811B92743E002BD30C /* Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 		44E7D7831B9395CF002BD30C /* ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = ionicons.ttf; sourceTree = "<group>"; };
 		455DB664F54474DB4CE5C93D /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
@@ -155,9 +159,11 @@
 		449E227C1B9CF6E7007EA099 /* Custom Filters */ = {
 			isa = PBXGroup;
 			children = (
+				446CE6E11BA1163800DAF5EC /* MedianBlendingSampler.cikernel */,
+				44E3452C1BA0FFCC006CE14C /* MedianBlending.cikernel */,
+				4490614E1B9D92EA00D3EFE0 /* MedianBlendingFilter.swift */,
 				449E22791B9CF6B8007EA099 /* GPUImageMedianBlendingFilter.h */,
 				449E227A1B9CF6B8007EA099 /* GPUImageMedianBlendingFilter.m */,
-				4490614E1B9D92EA00D3EFE0 /* MedianBlendingFilter.swift */,
 			);
 			name = "Custom Filters";
 			sourceTree = "<group>";
@@ -271,10 +277,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				446CE6E21BA1163800DAF5EC /* MedianBlendingSampler.cikernel in Resources */,
 				444B25AC1B63F3D60056D3E3 /* Main.storyboard in Resources */,
 				444B25B11B63F3D60056D3E3 /* LaunchScreen.xib in Resources */,
 				44E7D7841B9395CF002BD30C /* ionicons.ttf in Resources */,
 				444B25AE1B63F3D60056D3E3 /* Images.xcassets in Resources */,
+				44E3452D1BA0FFCC006CE14C /* MedianBlending.cikernel in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

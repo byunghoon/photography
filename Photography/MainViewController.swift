@@ -25,6 +25,10 @@ class MainViewController: UIViewController, SessionManagerDelegate {
     }
     
     @IBOutlet private weak var shutterButton: UIButton!
+    @IBOutlet private weak var previewImageView: UIImageView!
+    
+    private var originalImage: UIImage?
+    private var processedImage: UIImage?
     
     override func prefersStatusBarHidden() -> Bool {
         return true
@@ -69,6 +73,14 @@ class MainViewController: UIViewController, SessionManagerDelegate {
     
     // MARK: session manager delegate
     
+    func sessionManager(sessionManager: SessionManager, originalImage: UIImage?, processedImage: UIImage?) {
+        self.originalImage = originalImage
+        self.processedImage = processedImage
+        previewImageView.hidden = false
+        
+        previewImageView.image = originalImage
+    }
+    
     func sessionManager(sessionManager: SessionManager, didFailWithReason reason: FailureReason) {
         userInterfaceEnabled = false
         presentViewController(UIAlertController(title: "Session resumption failed", message: reason.description, preferredStyle: UIAlertControllerStyle.Alert), animated: true, completion: nil)
@@ -97,7 +109,21 @@ class MainViewController: UIViewController, SessionManagerDelegate {
     // MARK: outlets
     
     @IBAction func didTapCapture(sender: AnyObject) {
-        sessionManager.snapStillImage()
+        if previewImageView.hidden {
+            sessionManager.snapStillImage()
+        } else {
+            previewImageView.hidden = true
+        }
     }
     
+    @IBAction func didLongPressPreview(sender: AnyObject) {
+        switch (sender as! UILongPressGestureRecognizer).state {
+        case .Began, .Changed:
+            print("showing processed image")
+            previewImageView.image = processedImage
+        default:
+            print("showing original image")
+            previewImageView.image = originalImage
+        }
+    }
 }

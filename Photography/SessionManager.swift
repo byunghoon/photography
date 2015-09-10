@@ -24,6 +24,8 @@ protocol SessionManagerDelegate {
     
     func sessionManager(sessionManager: SessionManager, isCapturingStillImage: Bool)
     func sessionManager(sessionManager: SessionManager, isSessionRunning: Bool)
+    
+    func sessionManager(sessionManager: SessionManager, originalImage: UIImage?, processedImage: UIImage?)
 }
 
 enum FailureReason: String, CustomStringConvertible {
@@ -213,6 +215,7 @@ class SessionManager: NSObject {
             var currentImageData: NSData?
             ObjcUtility.tryBlock({ () -> Void in
                 let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer)
+                print(NSDate().timeIntervalSince1970)
                 self.imageComposer.addImageData(imageData)
                 currentImageData = imageData
                 
@@ -224,14 +227,17 @@ class SessionManager: NSObject {
                         if let _ = oneOfTheErrors {
                             print(oneOfTheErrors)
                             self.failedWithReason(.BracketedCaptureContainsNullBuffer)
+                            completion(success: false)
                             return
                         }
                         
-                        if let imageData = currentImageData {
-                            self.saveImage(imageData)
+                        if let originalData = currentImageData, originalImage = UIImage(data: originalData), processedImage = self.imageComposer.process() {
+                            self.delegate?.sessionManager(self, originalImage: originalImage, processedImage: processedImage)
+                            completion(success: true)
+                            return
                         }
                         
-                        self.saveImage(self.imageComposer.process())
+                        completion(success: false)
                     }
             })
         }
@@ -378,13 +384,13 @@ class SessionManager: NSObject {
     override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
         if context == SessionRunningContext {
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                self.delegate?.sessionManager(self, isCapturingStillImage: change?[NSKeyValueChangeNewKey]?.boolValue ?? false)
+                self.delegate?.sessionManager(self, isSessionRunning: change?[NSKeyValueChangeNewKey]?.boolValue ?? false)
             })
             
         } else if context == CapturingStillImageContext {
-            dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                self.delegate?.sessionManager(self, isSessionRunning: change?[NSKeyValueChangeNewKey]?.boolValue ?? false)
-            })
+//            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+//                self.delegate?.sessionManager(self, isCapturingStillImage: change?[NSKeyValueChangeNewKey]?.boolValue ?? false)
+//            })
             
         } else {
             super.observeValueForKeyPath(keyPath, ofObject: object, change: change, context: context)

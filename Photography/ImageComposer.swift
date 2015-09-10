@@ -11,15 +11,27 @@ import AVFoundation
 //import Photos
 
 class ImageComposer: NSObject {
+    private let filter = MedianBlendingFilter()
     private var dataArray: [NSData] = []
     
     func addImageData(imageData: NSData) {
         dataArray.append(imageData)
     }
     
-    func process() -> NSData {
-        let context = CIContext(options: nil)
+    func process() -> UIImage? {
+        if dataArray.count < 3 {
+            return nil
+        }
         
+        filter.inputImage0 = CIImage(data: dataArray[0])
+        filter.inputImage1 = CIImage(data: dataArray[1])
+        filter.inputImage2 = CIImage(data: dataArray[2])
+        
+        if let outputImage = filter.outputImage {
+            return UIImage(CIImage: outputImage)
+        }
+        
+        return nil
     }
     
     func reset() {
