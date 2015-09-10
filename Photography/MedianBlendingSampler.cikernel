@@ -4,9 +4,9 @@ kernel vec4 medianBlendingKernel(sampler src_a, sampler src_b, sampler src_c)
     vec4 b = unpremultiply(sample(src_b, samplerCoord(src_b)));
     vec4 c = unpremultiply(sample(src_c, samplerCoord(src_c)));
 
-    float r = compare(b.r - a.r, compare(c.r - b.r, b.r, compare(c.r - a.r, c.r, a.r)), compare(c.r - a.r, a.r, compare(c.r - b.r, c.r, b.r)))
-    float g = compare(b.g - a.g, compare(c.g - b.g, b.g, compare(c.g - a.g, c.g, a.g)), compare(c.g - a.g, a.g, compare(c.g - b.g, c.g, b.g)))
-    float b = compare(b.b - a.b, compare(c.b - b.b, b.b, compare(c.b - a.b, c.b, a.b)), compare(c.b - a.b, a.b, compare(c.b - b.b, c.b, b.b)))
+    float r = compare(b.r - a.r, compare(c.r - b.r, b.r, compare(c.r - a.r, c.r, a.r)), compare(c.r - a.r, a.r, compare(c.r - b.r, c.r, b.r)));
+    float g = compare(b.g - a.g, compare(c.g - b.g, b.g, compare(c.g - a.g, c.g, a.g)), compare(c.g - a.g, a.g, compare(c.g - b.g, c.g, b.g)));
+    float b = compare(b.b - a.b, compare(c.b - b.b, b.b, compare(c.b - a.b, c.b, a.b)), compare(c.b - a.b, a.b, compare(c.b - b.b, c.b, b.b)));
 
     return premultiply(vec4(r, g, b, 1.0));
 }
