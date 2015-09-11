@@ -1,8 +1,10 @@
+#define median(a, b, c) compare(b - a, compare(c - b, b, compare(c - a, c, a)), compare(c - a, a, compare(c - b, c, b)))
+
 kernel vec4 medianBlendingKernel(__sample a, __sample b, __sample c)
 {
-    float red = compare(b.r - a.r, compare(c.r - b.r, b.r, compare(c.r - a.r, c.r, a.r)), compare(c.r - a.r, a.r, compare(c.r - b.r, c.r, b.r)));
-    float green = compare(b.g - a.g, compare(c.g - b.g, b.g, compare(c.g - a.g, c.g, a.g)), compare(c.g - a.g, a.g, compare(c.g - b.g, c.g, b.g)));
-    float blue = compare(b.b - a.b, compare(c.b - b.b, b.b, compare(c.b - a.b, c.b, a.b)), compare(c.b - a.b, a.b, compare(c.b - b.b, c.b, b.b)));
+    float red = median(a.r, b.r, c.r);
+    float green = median(a.g, b.g, c.g);
+    float blue = median(a.b, b.b, c.b);
 
     return vec4(red, green, blue, 1.0);
 }
