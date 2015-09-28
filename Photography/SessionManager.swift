@@ -9,6 +9,7 @@
 import UIKit
 import AVFoundation
 import Photos
+import CoreMotion
 
 private let SessionRunningContext = UnsafeMutablePointer<Void>()
 private let CapturingStillImageContext = UnsafeMutablePointer<Void>()
@@ -26,6 +27,8 @@ protocol SessionManagerDelegate {
     func sessionManager(sessionManager: SessionManager, isSessionRunning: Bool)
     
     func sessionManager(sessionManager: SessionManager, originalImage: UIImage?, processedImage: UIImage?)
+    
+    func sessionManager(sessionManager: SessionManager, didUpdateAttitude attitude: CMAttitude)
 }
 
 enum FailureReason: String, CustomStringConvertible {
@@ -75,6 +78,8 @@ class SessionManager: NSObject {
     var bracketSettings: [AVCaptureAutoExposureBracketedStillImageSettings] = []
     
     let imageComposer = ImageComposer()
+    
+    private let motionManager = CMMotionManager()
     
     
     // MARK: session lifecycle
@@ -150,9 +155,8 @@ class SessionManager: NSObject {
     func snapStillImage() {
         dispatch_async(queue, { () -> Void in
             //self.performSingleCapture()
-            self.performBracketedCapture({ (success) -> Void in
-                //
-            })
+            //self.performBracketedCapture({ (success) -> Void in })
+            self.performExperimentalCapture()
         })
     }
     
@@ -240,6 +244,45 @@ class SessionManager: NSObject {
                         completion(success: false)
                     }
             })
+        }
+    }
+    
+    private func performExperimentalCapture() {
+        if !motionManager.deviceMotionAvailable {
+            print("Device motion is not available")
+            return
+        }
+        
+        guard let stillImageOutput = self.currentOutput else {
+            self.failedWithReason(.StillImageOutputDoesNotExist)
+            return
+        }
+        
+        let connection = stillImageOutput.connectionWithMediaType(AVMediaTypeVideo)
+        connection.videoOrientation = self.previewLayer.connection.videoOrientation
+        
+        stillImageOutput.captureStillImageAsynchronouslyFromConnection(connection) { (sampleBuffer1: CMSampleBuffer!, error: NSError!) -> Void in
+            let imageData1 = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer1)
+            self.delegate?.sessionManager(self, originalImage: UIImage(data: imageData1), processedImage: nil)
+            
+            self.motionManager.deviceMotionUpdateInterval = 0.01
+            self.motionManager.stopDeviceMotionUpdates()
+            self.motionManager.startDeviceMotionUpdatesToQueue(NSOperationQueue.mainQueue(), withHandler: { (data: CMDeviceMotion?, error: NSError?) -> Void in
+                if let attitude = data?.attitude {
+                    self.delegate?.sessionManager(self, didUpdateAttitude: attitude)
+                }
+            })
+            
+            
+//            dispatch_after(1, queue, { () -> Void in
+//                stillImageOutput.captureStillImageAsynchronouslyFromConnection(connection, completionHandler: { (sampleBuffer2: CMSampleBuffer!, error: NSError!) -> Void in
+//                    if let attitude = self.motionManager.deviceMotion?.attitude {
+//                        let imageData2 = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer1)
+//                        
+//                    }
+//                    
+//                })
+//            })
         }
     }
     

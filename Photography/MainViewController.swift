@@ -8,6 +8,7 @@
 
 import UIKit
 import AVFoundation
+import CoreMotion
 
 class PreviewView: UIView {
     override class func layerClass() -> AnyClass {
@@ -103,6 +104,11 @@ class MainViewController: UIViewController, SessionManagerDelegate {
     
     func sessionManager(sessionManager: SessionManager, isSessionRunning: Bool) {
         //
+    }
+    
+    func sessionManager(sessionManager: SessionManager, didUpdateAttitude attitude: CMAttitude) {
+        let r = attitude.rotationMatrix
+        previewImageView.layer.transform = CATransform3D(m11: CGFloat(r.m11), m12: CGFloat(r.m12), m13: CGFloat(r.m13), m14: 0, m21: CGFloat(r.m21), m22: CGFloat(r.m22), m23: CGFloat(r.m23), m24: 0, m31: CGFloat(r.m31), m32: CGFloat(r.m32), m33: CGFloat(r.m33), m34: 0, m41: 0, m42: 0, m43: 0, m44: 1)
     }
     
     
