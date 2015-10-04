@@ -21,7 +21,7 @@ struct RotationMatrix {
     let m33: CGFloat
 }
 
-class TimeRotationPair: NSObject {
+struct TimeRotationPair {
     let time: Double
     let rotationMatrix: RotationMatrix
     
@@ -31,16 +31,52 @@ class TimeRotationPair: NSObject {
     }
 }
 
-struct TimeRotationCubicSpline {
-    let m11Spline: CubicSpline
-    let m12Spline: CubicSpline
-    let m13Spline: CubicSpline
-    let m21Spline: CubicSpline
-    let m22Spline: CubicSpline
-    let m23Spline: CubicSpline
-    let m31Spline: CubicSpline
-    let m32Spline: CubicSpline
-    let m33Spline: CubicSpline
+struct QuadraticSpline {
+    let x1: CGFloat
+    let x2: CGFloat
+    let x3: CGFloat
+    let y1: CGFloat
+    let y2: CGFloat
+    let y3: CGFloat
+    
+    init(points: [CGPoint]) {
+        x1 = points[0].x
+        y1 = points[0].y
+        x2 = points[1].x
+        y2 = points[1].y
+        x3 = points[2].x
+        y3 = points[2].y
+    }
+    
+    func interpolate(x: CGFloat) -> CGFloat {
+        return ((x-x2) * (x-x3)) / ((x1-x2) * (x1-x3)) * y1 + ((x-x1) * (x-x3)) / ((x2-x1) * (x2-x3)) * y2 + ((x-x1) * (x-x2)) / ((x3-x1) * (x3-x2)) * y3
+    }
+}
+
+struct LinearSpline {
+    let a: CGFloat
+    let b: CGFloat
+    
+    init(points: [CGPoint]) {
+        a = (points[1].y - points[0].y) / (points[1].x - points[0].x)
+        b = points[0].y - (a * points[0].x)
+    }
+    
+    func interpolate(x: CGFloat) -> CGFloat {
+        return (a * x) + b
+    }
+}
+
+struct TimeRotationSpline {
+    let m11Spline: LinearSpline
+    let m12Spline: LinearSpline
+    let m13Spline: LinearSpline
+    let m21Spline: LinearSpline
+    let m22Spline: LinearSpline
+    let m23Spline: LinearSpline
+    let m31Spline: LinearSpline
+    let m32Spline: LinearSpline
+    let m33Spline: LinearSpline
     
     let offset: CGFloat
     let diff: CGFloat
@@ -78,15 +114,15 @@ struct TimeRotationCubicSpline {
             diff = 1
         }
 
-        m11Spline = CubicSpline(points: m11Points)
-        m12Spline = CubicSpline(points: m12Points)
-        m13Spline = CubicSpline(points: m13Points)
-        m21Spline = CubicSpline(points: m21Points)
-        m22Spline = CubicSpline(points: m22Points)
-        m23Spline = CubicSpline(points: m23Points)
-        m31Spline = CubicSpline(points: m31Points)
-        m32Spline = CubicSpline(points: m32Points)
-        m33Spline = CubicSpline(points: m33Points)
+        m11Spline = LinearSpline(points: m11Points)
+        m12Spline = LinearSpline(points: m12Points)
+        m13Spline = LinearSpline(points: m13Points)
+        m21Spline = LinearSpline(points: m21Points)
+        m22Spline = LinearSpline(points: m22Points)
+        m23Spline = LinearSpline(points: m23Points)
+        m31Spline = LinearSpline(points: m31Points)
+        m32Spline = LinearSpline(points: m32Points)
+        m33Spline = LinearSpline(points: m33Points)
     }
     
     func interpolate(time: NSTimeInterval) -> RotationMatrix {

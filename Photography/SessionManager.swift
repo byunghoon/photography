@@ -10,6 +10,7 @@ import UIKit
 import AVFoundation
 import Photos
 import CoreMotion
+import AGGeometryKit
 
 private let SessionRunningContext = UnsafeMutablePointer<Void>()
 private let CapturingStillImageContext = UnsafeMutablePointer<Void>()
@@ -282,10 +283,10 @@ extension SessionManager {
                 time2 = NSDate().timeIntervalSince1970
                 
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.1 * Double(NSEC_PER_SEC))), self.queue) { () -> Void in
-                    let spline1 = TimeRotationCubicSpline(points: self.relevantPoints(points, time: time1))
+                    let spline1 = TimeRotationSpline(points: self.relevantPoints(points, time: time1))
                     print(spline1.interpolate(time1))
                     
-                    let spline2 = TimeRotationCubicSpline(points: self.relevantPoints(points, time: time2))
+                    let spline2 = TimeRotationSpline(points: self.relevantPoints(points, time: time2))
                     print(spline2.interpolate(time2))
                     
                     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.1 * Double(NSEC_PER_SEC))), self.queue) { () -> Void in
@@ -293,11 +294,22 @@ extension SessionManager {
                     }
                 }
                 
-                let processedImage = UIImage(data: AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer))
-                dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                    self.delegate?.sessionManager(self, originalImage: originalImage, processedImage: processedImage)
-            
-                })
+                guard let rawImage = UIImage(data: AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer)) else {
+                    return
+                }
+                
+                let transform = CATransform3D(m11: CGFloat(r.m11), m12: CGFloat(r.m12), m13: CGFloat(r.m13), m14: 0, m21: CGFloat(r.m21), m22: CGFloat(r.m22), m23: CGFloat(r.m23), m24: 0, m31: CGFloat(r.m31), m32: CGFloat(r.m32), m33: CGFloat(r.m33), m34: 0, m41: 0, m42: 0, m43: 0, m44: 1)
+                
+                let originalQuad = AGKQuadMakeWithCGSize(rawImage.size)
+                let transformedQuad = AGKQuadApplyCATransform3D(originalQuad, <#T##t: CATransform3D##CATransform3D#>)
+                
+//                let originalRect = CGRect(x: 0, y: 0, width: rawImage.size.width, height: rawImage.size.height)
+//                let transformedRect = CGRectApplyAffineTransform(originalRect, CATransform3DMakeAffineTransform)
+                
+//                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+//                    self.delegate?.sessionManager(self, originalImage: originalImage, processedImage: processedImage)
+//            
+//                })
             }
         }
     }
@@ -305,7 +317,7 @@ extension SessionManager {
     private func relevantPoints(points: [TimeRotationPair], time: NSTimeInterval) -> [TimeRotationPair]  {
         for var i = 2; i < points.count - 1; i++ {
             if points[i].time > time {
-                return [points[i-2], points[i-1], points[i], points[i+1]]
+                return [points[i-1], points[i]]
             }
         }
         return []
