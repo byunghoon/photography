@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		24AE7A075A171D644D375A7E /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36BA3E73AE90C6BE0B871D2A /* libPods.a */; };
 		440239391BC17225007910BE /* ImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440239381BC17225007910BE /* ImageViewController.swift */; settings = {ASSET_TAGS = (); }; };
+		4402393B1BC19674007910BE /* AttitudeCubicSpline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4402393A1BC19674007910BE /* AttitudeCubicSpline.swift */; settings = {ASSET_TAGS = (); }; };
 		444B25A71B63F3D60056D3E3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 444B25A61B63F3D60056D3E3 /* AppDelegate.swift */; };
 		444B25A91B63F3D60056D3E3 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 444B25A81B63F3D60056D3E3 /* MainViewController.swift */; };
 		444B25AC1B63F3D60056D3E3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 444B25AA1B63F3D60056D3E3 /* Main.storyboard */; };
@@ -23,6 +23,7 @@
 		44E3452D1BA0FFCC006CE14C /* MedianBlending.cikernel in Resources */ = {isa = PBXBuildFile; fileRef = 44E3452C1BA0FFCC006CE14C /* MedianBlending.cikernel */; settings = {ASSET_TAGS = (); }; };
 		44E7D7821B92743E002BD30C /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44E7D7811B92743E002BD30C /* Utility.swift */; };
 		44E7D7841B9395CF002BD30C /* ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 44E7D7831B9395CF002BD30C /* ionicons.ttf */; };
+		DEBBF2FD59B0AA641B0D6756 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9F71B6B3629171B831B01AAF /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,9 +37,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		36BA3E73AE90C6BE0B871D2A /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3BAB0835282C4BF5C2CBB7E3 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		440239381BC17225007910BE /* ImageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageViewController.swift; sourceTree = "<group>"; };
+		4402393A1BC19674007910BE /* AttitudeCubicSpline.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AttitudeCubicSpline.swift; sourceTree = "<group>"; };
 		444B25A11B63F3D60056D3E3 /* Photography.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Photography.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		444B25A51B63F3D60056D3E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		444B25A61B63F3D60056D3E3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -60,6 +61,7 @@
 		44E7D7811B92743E002BD30C /* Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 		44E7D7831B9395CF002BD30C /* ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = ionicons.ttf; sourceTree = "<group>"; };
 		455DB664F54474DB4CE5C93D /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
+		9F71B6B3629171B831B01AAF /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,7 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				24AE7A075A171D644D375A7E /* libPods.a in Frameworks */,
+				DEBBF2FD59B0AA641B0D6756 /* Pods.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -152,6 +154,7 @@
 				44E7D7811B92743E002BD30C /* Utility.swift */,
 				4490614A1B9D8DF800D3EFE0 /* ObjcUtility.h */,
 				4490614B1B9D8DF800D3EFE0 /* ObjcUtility.m */,
+				4402393A1BC19674007910BE /* AttitudeCubicSpline.swift */,
 			);
 			name = Common;
 			sourceTree = "<group>";
@@ -177,7 +180,7 @@
 		466E09E9BB3128CE206B0D6B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				36BA3E73AE90C6BE0B871D2A /* libPods.a */,
+				9F71B6B3629171B831B01AAF /* Pods.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -203,6 +206,7 @@
 				444B259E1B63F3D60056D3E3 /* Frameworks */,
 				444B259F1B63F3D60056D3E3 /* Resources */,
 				E6CB481485BAF415F5416E8A /* Copy Pods Resources */,
+				B45E0D8C9E7BD2B344F479F8 /* Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -309,6 +313,21 @@
 			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
+		B45E0D8C9E7BD2B344F479F8 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		E6CB481485BAF415F5416E8A /* Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -331,6 +350,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4402393B1BC19674007910BE /* AttitudeCubicSpline.swift in Sources */,
 				440239391BC17225007910BE /* ImageViewController.swift in Sources */,
 				44E7D7821B92743E002BD30C /* Utility.swift in Sources */,
 				444B25A91B63F3D60056D3E3 /* MainViewController.swift in Sources */,

@@ -252,23 +252,63 @@ extension SessionManager {
             return
         }
         
+        var points: [TimeRotationPair] = []
+        self.motionManager.deviceMotionUpdateInterval = 0.01
+        self.motionManager.startDeviceMotionUpdatesToQueue(NSOperationQueue.mainQueue()) { (motion: CMDeviceMotion?, error: NSError?) -> Void in
+            if let attitude = motion?.attitude {
+                points.append(TimeRotationPair(time: NSDate().timeIntervalSince1970, rotationMatrix: attitude.rotationMatrix))
+            }
+        }
+        
         let connection = stillImageOutput.connectionWithMediaType(AVMediaTypeVideo)
         connection.videoOrientation = previewLayer.connection.videoOrientation
         
         var numberOfWaitingBrackets = bracketSettings.count
         var originalImage: UIImage?
         
-        stillImageOutput.captureStillImageBracketAsynchronouslyFromConnection(connection, withSettingsArray: bracketSettings) { (sampleBuffer: CMSampleBuffer!, stillImageSettings: AVCaptureBracketedStillImageSettings!, error: NSError!) -> Void in
+        var time1: NSTimeInterval = 0
+        var time2: NSTimeInterval = 0
+        
+        while (points.count == 0) {}
+        
+        stillImageOutput.captureStillImageBracketAsynchronouslyFromConnection(connection, withSettingsArray: self.bracketSettings) { (sampleBuffer: CMSampleBuffer!, stillImageSettings: AVCaptureBracketedStillImageSettings!, error: NSError!) -> Void in
             numberOfWaitingBrackets--
             
             if numberOfWaitingBrackets == self.bracketSettings.count - 1 {
+                time1 = NSDate().timeIntervalSince1970
                 originalImage = UIImage(data: AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer))
                 
             } else if numberOfWaitingBrackets == 0 {
+                time2 = NSDate().timeIntervalSince1970
+                
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.1 * Double(NSEC_PER_SEC))), self.queue) { () -> Void in
+                    let spline1 = TimeRotationCubicSpline(points: self.relevantPoints(points, time: time1))
+                    print(spline1.interpolate(time1))
+                    
+                    let spline2 = TimeRotationCubicSpline(points: self.relevantPoints(points, time: time2))
+                    print(spline2.interpolate(time2))
+                    
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.1 * Double(NSEC_PER_SEC))), self.queue) { () -> Void in
+                        self.motionManager.stopDeviceMotionUpdates()
+                    }
+                }
+                
                 let processedImage = UIImage(data: AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer))
-                self.delegate?.sessionManager(self, originalImage: originalImage, processedImage: processedImage)
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    self.delegate?.sessionManager(self, originalImage: originalImage, processedImage: processedImage)
+            
+                })
             }
         }
+    }
+    
+    private func relevantPoints(points: [TimeRotationPair], time: NSTimeInterval) -> [TimeRotationPair]  {
+        for var i = 2; i < points.count - 1; i++ {
+            if points[i].time > time {
+                return [points[i-2], points[i-1], points[i], points[i+1]]
+            }
+        }
+        return []
     }
     
 //    private func performBracketedCapture(completion: ImageCompletion) {
