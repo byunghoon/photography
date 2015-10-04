@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		24AE7A075A171D644D375A7E /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36BA3E73AE90C6BE0B871D2A /* libPods.a */; };
+		440239391BC17225007910BE /* ImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440239381BC17225007910BE /* ImageViewController.swift */; settings = {ASSET_TAGS = (); }; };
 		444B25A71B63F3D60056D3E3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 444B25A61B63F3D60056D3E3 /* AppDelegate.swift */; };
 		444B25A91B63F3D60056D3E3 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 444B25A81B63F3D60056D3E3 /* MainViewController.swift */; };
 		444B25AC1B63F3D60056D3E3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 444B25AA1B63F3D60056D3E3 /* Main.storyboard */; };
@@ -38,6 +39,7 @@
 /* Begin PBXFileReference section */
 		36BA3E73AE90C6BE0B871D2A /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3BAB0835282C4BF5C2CBB7E3 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
+		440239381BC17225007910BE /* ImageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageViewController.swift; sourceTree = "<group>"; };
 		444B25A11B63F3D60056D3E3 /* Photography.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Photography.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		444B25A51B63F3D60056D3E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		444B25A61B63F3D60056D3E3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -108,6 +110,7 @@
 				4490614D1B9D8E9100D3EFE0 /* Common */,
 				449E227C1B9CF6E7007EA099 /* Custom Filters */,
 				444B25A81B63F3D60056D3E3 /* MainViewController.swift */,
+				440239381BC17225007910BE /* ImageViewController.swift */,
 				44825FF21B9230E5002C2D64 /* SessionManager.swift */,
 				449E22761B9CADB5007EA099 /* ImageComposer.swift */,
 				444B25A61B63F3D60056D3E3 /* AppDelegate.swift */,
@@ -334,6 +337,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				449E227B1B9CF6B8007EA099 /* GPUImageMedianBlendingFilter.m in Sources */,
+				440239391BC17225007910BE /* ImageViewController.swift in Sources */,
 				44E7D7821B92743E002BD30C /* Utility.swift in Sources */,
 				444B25A91B63F3D60056D3E3 /* MainViewController.swift in Sources */,
 				449E22771B9CADB5007EA099 /* ImageComposer.swift in Sources */,

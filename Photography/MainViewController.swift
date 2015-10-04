@@ -25,11 +25,11 @@ class MainViewController: UIViewController, SessionManagerDelegate {
         }
     }
     
+    @IBOutlet weak var previewView: PreviewView!
     @IBOutlet private weak var shutterButton: UIButton!
-    @IBOutlet private weak var previewImageView: UIImageView!
     
-    private var originalImage: UIImage?
-    private var processedImage: UIImage?
+    
+    // MARK: view
     
     override func prefersStatusBarHidden() -> Bool {
         return true
@@ -38,7 +38,7 @@ class MainViewController: UIViewController, SessionManagerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        sessionManager = SessionManager(previewLayer: view.layer as! AVCaptureVideoPreviewLayer)
+        sessionManager = SessionManager(previewLayer: previewView.layer as! AVCaptureVideoPreviewLayer)
         sessionManager.delegate = self
         
         userInterfaceEnabled = false
@@ -75,11 +75,12 @@ class MainViewController: UIViewController, SessionManagerDelegate {
     // MARK: session manager delegate
     
     func sessionManager(sessionManager: SessionManager, originalImage: UIImage?, processedImage: UIImage?) {
-        self.originalImage = originalImage
-        self.processedImage = processedImage
-        previewImageView.hidden = false
+        let imageViewController = ImageViewController.controllerFromStoryboard()
+        imageViewController.originalImage = originalImage
+        imageViewController.processedImage = processedImage
         
-        previewImageView.image = originalImage
+        let navigationController = UINavigationController(rootViewController: imageViewController)
+        presentViewController(navigationController, animated: true, completion: nil)
     }
     
     func sessionManager(sessionManager: SessionManager, didFailWithReason reason: FailureReason) {
@@ -96,9 +97,9 @@ class MainViewController: UIViewController, SessionManagerDelegate {
     }
     
     func sessionManager(sessionManager: SessionManager, isCapturingStillImage: Bool) {
-        view.layer.opacity = 0
+        previewView.layer.opacity = 0
         UIView.animateWithDuration(0.25) { () -> Void in
-            self.view.layer.opacity = 1
+            self.previewView.layer.opacity = 1
         }
     }
     
@@ -106,30 +107,15 @@ class MainViewController: UIViewController, SessionManagerDelegate {
         //
     }
     
-    func sessionManager(sessionManager: SessionManager, didUpdateAttitude attitude: CMAttitude) {
-        let r = attitude.rotationMatrix
-        previewImageView.layer.transform = CATransform3D(m11: CGFloat(r.m11), m12: CGFloat(r.m12), m13: CGFloat(r.m13), m14: 0, m21: CGFloat(r.m21), m22: CGFloat(r.m22), m23: CGFloat(r.m23), m24: 0, m31: CGFloat(r.m31), m32: CGFloat(r.m32), m33: CGFloat(r.m33), m34: 0, m41: 0, m42: 0, m43: 0, m44: 1)
-    }
+//    func sessionManager(sessionManager: SessionManager, didUpdateAttitude attitude: CMAttitude) {
+//        let r = attitude.rotationMatrix
+//        previewImageView.layer.transform = CATransform3D(m11: CGFloat(r.m11), m12: CGFloat(r.m12), m13: CGFloat(r.m13), m14: 0, m21: CGFloat(r.m21), m22: CGFloat(r.m22), m23: CGFloat(r.m23), m24: 0, m31: CGFloat(r.m31), m32: CGFloat(r.m32), m33: CGFloat(r.m33), m34: 0, m41: 0, m42: 0, m43: 0, m44: 1)
+//    }
     
     
     // MARK: outlets
     
     @IBAction func didTapCapture(sender: AnyObject) {
-        if previewImageView.hidden {
-            sessionManager.snapStillImage()
-        } else {
-            previewImageView.hidden = true
-        }
-    }
-    
-    @IBAction func didLongPressPreview(sender: AnyObject) {
-        switch (sender as! UILongPressGestureRecognizer).state {
-        case .Began, .Changed:
-            print("showing processed image")
-            previewImageView.image = processedImage
-        default:
-            print("showing original image")
-            previewImageView.image = originalImage
-        }
+        sessionManager.snapStillImage()
     }
 }

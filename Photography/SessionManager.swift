@@ -28,7 +28,7 @@ protocol SessionManagerDelegate {
     
     func sessionManager(sessionManager: SessionManager, originalImage: UIImage?, processedImage: UIImage?)
     
-    func sessionManager(sessionManager: SessionManager, didUpdateAttitude attitude: CMAttitude)
+//    func sessionManager(sessionManager: SessionManager, didUpdateAttitude attitude: CMAttitude)
 }
 
 enum FailureReason: String, CustomStringConvertible {
@@ -77,6 +77,12 @@ class SessionManager: NSObject {
     var exposureBias: Float = 0
     var bracketSettings: [AVCaptureAutoExposureBracketedStillImageSettings] = []
     
+    private var currentInput: AVCaptureDeviceInput?
+    private var currentOutput: AVCaptureStillImageOutput?
+
+    private let kSessionRunning = "sessionRunning"
+    private let kCapturingStillImage = "capturingStillImage"
+
     let imageComposer = ImageComposer()
     
     private let motionManager = CMMotionManager()
@@ -146,10 +152,18 @@ class SessionManager: NSObject {
         })
     }
     
+    private func failedWithReason(reason: FailureReason) {
+        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+            self.delegate?.sessionManager(self, didFailWithReason: reason)
+            self.isConfigured = false
+        })
+    }
     
-    // MARK: camera
+    
+    // MARK: controls
     
     func changeCamera() {
+        
     }
     
     func snapStillImage() {
@@ -165,16 +179,42 @@ class SessionManager: NSObject {
     }
     
     
-    // MARK: helper
+    // MARK: Am I really sure the following are called from main thread?
     
-    private func failedWithReason(reason: FailureReason) {
-        delegate?.sessionManager(self, didFailWithReason: reason)
-        isConfigured = false
+    func subjectAreaDidChange(notification: NSNotification) {
+        //CGPoint devicePoint = CGPointMake( 0.5, 0.5 );
+        //[self focusWithMode:AVCaptureFocusModeContinuousAutoFocus exposeWithMode:AVCaptureExposureModeContinuousAutoExposure atDevicePoint:devicePoint monitorSubjectAreaChange:NO];
     }
     
-    
-    // MARK: in-queue operation
-    
+    func sessionRuntimeError(notification: NSNotification) {
+        if let error = notification.userInfo?[AVCaptureSessionErrorKey] as? NSError {
+            print("Capture session runtime error \(error)")
+            
+            // Automatically try to restart the session running if media services were reset and the last start running succeeded.
+            // Otherwise, enable the user to try to resume the session running.
+            if error.code == AVError.MediaServicesWereReset.rawValue {
+                dispatch_async(queue, { () -> Void in
+                    if self.sessionShouldRun {
+                        self.session.startRunning()
+                        self.sessionShouldRun = self.session.running
+                        
+                    } else {
+                        self.failedWithReason(.SessionRuntimeError)
+                    }
+                })
+            }
+            
+        } else {
+            self.failedWithReason(.SessionRuntimeError)
+        }
+    }
+}
+
+
+// MARK: - Queued operations
+
+extension SessionManager {
+
     private func prepareBrackets() {
         guard let stillImageOutput = currentOutput else {
             failedWithReason(.StillImageOutputDoesNotExist)
@@ -191,7 +231,9 @@ class SessionManager: NSObject {
         stillImageOutput.prepareToCaptureStillImageBracketFromConnection(connection, withSettingsArray: bracketSettings, completionHandler: { (prepared: Bool, error: NSError!) -> Void in
             if prepared {
                 print("Successfully prepared brackets (max: \(stillImageOutput.maxBracketedCaptureStillImageCount), actual: \(self.bracketSettings.count))")
-                self.delegate?.sessionManagerIsReadyForBracketedCapture(self)
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    self.delegate?.sessionManagerIsReadyForBracketedCapture(self)
+                })
                 
             } else {
                 self.failedWithReason(.BracketsCannotBePrepared)
@@ -236,7 +278,9 @@ class SessionManager: NSObject {
                         }
                         
                         if let originalData = currentImageData, originalImage = UIImage(data: originalData), processedImage = self.imageComposer.process() {
-                            self.delegate?.sessionManager(self, originalImage: originalImage, processedImage: processedImage)
+                            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                                self.delegate?.sessionManager(self, originalImage: originalImage, processedImage: processedImage)
+                            })
                             completion(success: true)
                             return
                         }
@@ -269,7 +313,7 @@ class SessionManager: NSObject {
             self.motionManager.stopDeviceMotionUpdates()
             self.motionManager.startDeviceMotionUpdatesToQueue(NSOperationQueue.mainQueue(), withHandler: { (data: CMDeviceMotion?, error: NSError?) -> Void in
                 if let attitude = data?.attitude {
-                    self.delegate?.sessionManager(self, didUpdateAttitude: attitude)
+//                    self.delegate?.sessionManager(self, didUpdateAttitude: attitude)
                 }
             })
             
@@ -342,9 +386,6 @@ class SessionManager: NSObject {
     
     // MARK: I/O setup
     
-    private var currentInput: AVCaptureDeviceInput?
-    private var currentOutput: AVCaptureStillImageOutput?
-    
     private func setupInput(devicePosition preferringDevicePosition: AVCaptureDevicePosition) {
         if let _ = currentInput {
             session.removeInput(currentInput)
@@ -398,10 +439,7 @@ class SessionManager: NSObject {
     }
     
     
-    // MARK: KVO
-    
-    private let kSessionRunning = "sessionRunning"
-    private let kCapturingStillImage = "capturingStillImage"
+    // MARK: KVO (TODO: check which thread)
     
     private func addObservers() {
         // TODO: try removing context and use keyPath
@@ -439,33 +477,4 @@ class SessionManager: NSObject {
             super.observeValueForKeyPath(keyPath, ofObject: object, change: change, context: context)
         }
     }
-    
-    func subjectAreaDidChange(notification: NSNotification) {
-        //CGPoint devicePoint = CGPointMake( 0.5, 0.5 );
-        //[self focusWithMode:AVCaptureFocusModeContinuousAutoFocus exposeWithMode:AVCaptureExposureModeContinuousAutoExposure atDevicePoint:devicePoint monitorSubjectAreaChange:NO];
-    }
-    
-    func sessionRuntimeError(notification: NSNotification) {
-        if let error = notification.userInfo?[AVCaptureSessionErrorKey] as? NSError {
-            print("Capture session runtime error \(error)")
-            
-            // Automatically try to restart the session running if media services were reset and the last start running succeeded.
-            // Otherwise, enable the user to try to resume the session running.
-            if error.code == AVError.MediaServicesWereReset.rawValue {
-                dispatch_async(queue, { () -> Void in
-                    if self.sessionShouldRun {
-                        self.session.startRunning()
-                        self.sessionShouldRun = self.session.running
-                        
-                    } else {
-                        self.failedWithReason(.SessionRuntimeError)
-                    }
-                })
-            }
-            
-        } else {
-            self.failedWithReason(.SessionRuntimeError)
-        }
-    }
-    
 }
