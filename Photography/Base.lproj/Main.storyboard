@@ -24,7 +24,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="EMH-3s-U0O" customClass="PreviewView" customModule="Photography" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="-100" width="600" height="800"/>
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="800"/>
                                 <animations/>
                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
@@ -51,6 +51,7 @@
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="EMH-3s-U0O" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="3Mb-Dv-6AV"/>
+                            <constraint firstItem="EMH-3s-U0O" firstAttribute="top" secondItem="kh9-bI-dsS" secondAttribute="top" id="Kj5-TN-yg3"/>
                             <constraint firstItem="EMH-3s-U0O" firstAttribute="centerY" secondItem="kh9-bI-dsS" secondAttribute="centerY" id="McZ-w1-Q66"/>
                             <constraint firstItem="EMH-3s-U0O" firstAttribute="centerX" secondItem="kh9-bI-dsS" secondAttribute="centerX" id="MrT-9q-ZM8"/>
                             <constraint firstItem="Boe-cd-zIa" firstAttribute="centerX" secondItem="kh9-bI-dsS" secondAttribute="centerX" id="Neq-g3-cjG"/>
@@ -59,6 +60,7 @@
                         </constraints>
                         <variation key="default">
                             <mask key="constraints">
+                                <exclude reference="McZ-w1-Q66"/>
                                 <exclude reference="MrT-9q-ZM8"/>
                             </mask>
                         </variation>
@@ -88,20 +90,42 @@
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1qt-UT-6R1">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                                 <subviews>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="JgD-HV-p5m">
+                                    <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="JgD-HV-p5m">
                                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                                         <animations/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="600" id="5Eb-zi-CsP"/>
+                                            <constraint firstAttribute="height" constant="600" id="JlN-XD-ME0"/>
+                                        </constraints>
                                     </imageView>
                                 </subviews>
                                 <animations/>
                                 <constraints>
                                     <constraint firstItem="JgD-HV-p5m" firstAttribute="centerX" secondItem="1qt-UT-6R1" secondAttribute="centerX" id="16W-JJ-yf7"/>
+                                    <constraint firstItem="JgD-HV-p5m" firstAttribute="leading" secondItem="1qt-UT-6R1" secondAttribute="leading" id="4Wr-Db-m8y"/>
                                     <constraint firstItem="JgD-HV-p5m" firstAttribute="centerY" secondItem="1qt-UT-6R1" secondAttribute="centerY" id="BwN-Wi-VFA"/>
+                                    <constraint firstAttribute="bottom" secondItem="JgD-HV-p5m" secondAttribute="bottom" id="L9s-34-G36"/>
                                     <constraint firstItem="JgD-HV-p5m" firstAttribute="top" secondItem="1qt-UT-6R1" secondAttribute="top" id="Y8Y-3U-D5A"/>
                                     <constraint firstAttribute="trailing" secondItem="JgD-HV-p5m" secondAttribute="trailing" id="bTJ-nN-zdm"/>
+                                    <constraint firstItem="JgD-HV-p5m" firstAttribute="leading" secondItem="1qt-UT-6R1" secondAttribute="leading" id="fPs-E2-EHi"/>
                                     <constraint firstItem="JgD-HV-p5m" firstAttribute="leading" secondItem="1qt-UT-6R1" secondAttribute="leading" id="iuU-4Q-if4"/>
                                     <constraint firstAttribute="bottom" secondItem="JgD-HV-p5m" secondAttribute="bottom" id="j6J-c5-Hvf"/>
+                                    <constraint firstItem="JgD-HV-p5m" firstAttribute="top" secondItem="1qt-UT-6R1" secondAttribute="top" id="mk0-vY-E1g"/>
+                                    <constraint firstItem="JgD-HV-p5m" firstAttribute="top" secondItem="1qt-UT-6R1" secondAttribute="top" id="oso-R3-vQi"/>
+                                    <constraint firstAttribute="trailing" secondItem="JgD-HV-p5m" secondAttribute="trailing" id="tS6-Ta-Uxx"/>
                                 </constraints>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="16W-JJ-yf7"/>
+                                        <exclude reference="4Wr-Db-m8y"/>
+                                        <exclude reference="BwN-Wi-VFA"/>
+                                        <exclude reference="Y8Y-3U-D5A"/>
+                                        <exclude reference="bTJ-nN-zdm"/>
+                                        <exclude reference="iuU-4Q-if4"/>
+                                        <exclude reference="j6J-c5-Hvf"/>
+                                        <exclude reference="mk0-vY-E1g"/>
+                                    </mask>
+                                </variation>
                             </scrollView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="0mn-IF-qGN">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
@@ -123,7 +147,9 @@
                     </view>
                     <navigationItem key="navigationItem" id="ZFB-0f-ep0"/>
                     <connections>
+                        <outlet property="fullImageHeight" destination="JlN-XD-ME0" id="RY9-kq-bAH"/>
                         <outlet property="fullImageView" destination="JgD-HV-p5m" id="lAh-wn-oi9"/>
+                        <outlet property="fullImageWidth" destination="5Eb-zi-CsP" id="z4V-3O-gCj"/>
                         <outlet property="scaledImageView" destination="0mn-IF-qGN" id="E0K-RM-tU1"/>
                         <outlet property="scrollView" destination="1qt-UT-6R1" id="EEl-xd-9q5"/>
                     </connections>

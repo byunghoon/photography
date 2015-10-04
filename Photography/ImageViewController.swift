@@ -12,6 +12,8 @@ class ImageViewController: UIViewController {
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var fullImageView: UIImageView!
     @IBOutlet weak var scaledImageView: UIImageView!
+    @IBOutlet weak var fullImageWidth: NSLayoutConstraint!
+    @IBOutlet weak var fullImageHeight: NSLayoutConstraint!
     
     var originalImage: UIImage? { didSet { updateViews() } }
     var processedImage: UIImage? { didSet { updateViews() } }
@@ -36,10 +38,15 @@ class ImageViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationItem.leftBarButtonItems = [UIBarButtonItem(title: "Mode", style: UIBarButtonItemStyle.Plain, target: self, action: "didTapMode"), UIBarButtonItem(title: "Type", style: UIBarButtonItemStyle.Plain, target: self, action: "didTapSwitch")]
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Done, target: self, action: "didTapType")
+        navigationItem.leftBarButtonItems = [UIBarButtonItem(title: "Mode", style: UIBarButtonItemStyle.Plain, target: self, action: "didTapMode"), UIBarButtonItem(title: "Type", style: UIBarButtonItemStyle.Plain, target: self, action: "didTapType")]
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Done, target: self, action: "didTapDone")
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
         
-        viewMode = .Scaled
+        viewMode = .Full
+        presentedImage = .Original
     }
     
     private func updateViews() {
@@ -50,7 +57,8 @@ class ImageViewController: UIViewController {
             
             fullImageView.image = presentedImage == .Original ? originalImage : processedImage
             if let image = fullImageView.image {
-                fullImageView.frame = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
+                fullImageWidth.constant = image.size.width
+                fullImageHeight.constant = image.size.height
                 scrollView.contentSize = image.size
             }
             

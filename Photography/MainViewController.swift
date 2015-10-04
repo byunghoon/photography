@@ -61,13 +61,17 @@ class MainViewController: UIViewController, SessionManagerDelegate {
         sessionManager.configure()
     }
     
+    var once = true
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        sessionManager.resume()
+        if once {
+            once = false
+            sessionManager.resume()
+        }
     }
     
     override func viewWillDisappear(animated: Bool) {
-        sessionManager.pause()
+//        sessionManager.pause()
         super.viewWillDisappear(animated)
     }
     
@@ -76,6 +80,7 @@ class MainViewController: UIViewController, SessionManagerDelegate {
     
     func sessionManager(sessionManager: SessionManager, originalImage: UIImage?, processedImage: UIImage?) {
         let imageViewController = ImageViewController.controllerFromStoryboard()
+        let _ = imageViewController.view
         imageViewController.originalImage = originalImage
         imageViewController.processedImage = processedImage
         

@@ -60,7 +60,7 @@ enum FailureReason: String, CustomStringConvertible {
 }
 
 private struct SessionConfiguration {
-    static let maxBracketedImageCount = 3
+    static let maxBracketedImageCount = 5
 }
 
 class SessionManager: NSObject {
@@ -241,7 +241,12 @@ extension SessionManager {
         })
     }
     
-    private func performBracketedCapture(completion: ImageCompletion) {
+    private func performExperimentalCapture() {
+        if !motionManager.deviceMotionAvailable {
+            print("Device motion is not available")
+            return
+        }
+        
         guard let stillImageOutput = currentOutput else {
             failedWithReason(.StillImageOutputDoesNotExist)
             return
@@ -251,137 +256,123 @@ extension SessionManager {
         connection.videoOrientation = previewLayer.connection.videoOrientation
         
         var numberOfWaitingBrackets = bracketSettings.count
-        var oneOfTheErrors: NSError? = nil
-        
-        imageComposer.reset()
+        var originalImage: UIImage?
         
         stillImageOutput.captureStillImageBracketAsynchronouslyFromConnection(connection, withSettingsArray: bracketSettings) { (sampleBuffer: CMSampleBuffer!, stillImageSettings: AVCaptureBracketedStillImageSettings!, error: NSError!) -> Void in
             numberOfWaitingBrackets--
             
-            var currentImageData: NSData?
-            ObjcUtility.tryBlock({ () -> Void in
-                let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer)
-                print(NSDate().timeIntervalSince1970)
-                self.imageComposer.addImageData(imageData)
-                currentImageData = imageData
+            if numberOfWaitingBrackets == self.bracketSettings.count - 1 {
+                originalImage = UIImage(data: AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer))
                 
-                }, catchBlock: { (exception: NSException!) -> Void in
-                    oneOfTheErrors = error
-                    
-                }, finallyBlock: { () -> Void in
-                    if numberOfWaitingBrackets == 0 {
-                        if let _ = oneOfTheErrors {
-                            print(oneOfTheErrors)
-                            self.failedWithReason(.BracketedCaptureContainsNullBuffer)
-                            completion(success: false)
-                            return
-                        }
-                        
-                        if let originalData = currentImageData, originalImage = UIImage(data: originalData), processedImage = self.imageComposer.process() {
-                            dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                                self.delegate?.sessionManager(self, originalImage: originalImage, processedImage: processedImage)
-                            })
-                            completion(success: true)
-                            return
-                        }
-                        
-                        completion(success: false)
-                    }
-            })
+            } else if numberOfWaitingBrackets == 0 {
+                let processedImage = UIImage(data: AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer))
+                self.delegate?.sessionManager(self, originalImage: originalImage, processedImage: processedImage)
+            }
         }
     }
     
-    private func performExperimentalCapture() {
-        if !motionManager.deviceMotionAvailable {
-            print("Device motion is not available")
-            return
-        }
-        
-        guard let stillImageOutput = self.currentOutput else {
-            self.failedWithReason(.StillImageOutputDoesNotExist)
-            return
-        }
-        
-        let connection = stillImageOutput.connectionWithMediaType(AVMediaTypeVideo)
-        connection.videoOrientation = self.previewLayer.connection.videoOrientation
-        
-        stillImageOutput.captureStillImageAsynchronouslyFromConnection(connection) { (sampleBuffer1: CMSampleBuffer!, error: NSError!) -> Void in
-            let imageData1 = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer1)
-            self.delegate?.sessionManager(self, originalImage: UIImage(data: imageData1), processedImage: nil)
-            
-            self.motionManager.deviceMotionUpdateInterval = 0.01
-            self.motionManager.stopDeviceMotionUpdates()
-            self.motionManager.startDeviceMotionUpdatesToQueue(NSOperationQueue.mainQueue(), withHandler: { (data: CMDeviceMotion?, error: NSError?) -> Void in
-                if let attitude = data?.attitude {
-//                    self.delegate?.sessionManager(self, didUpdateAttitude: attitude)
-                }
-            })
-            
-            
-//            dispatch_after(1, queue, { () -> Void in
-//                stillImageOutput.captureStillImageAsynchronouslyFromConnection(connection, completionHandler: { (sampleBuffer2: CMSampleBuffer!, error: NSError!) -> Void in
-//                    if let attitude = self.motionManager.deviceMotion?.attitude {
-//                        let imageData2 = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer1)
-//                        
-//                    }
+//    private func performBracketedCapture(completion: ImageCompletion) {
+//        guard let stillImageOutput = currentOutput else {
+//            failedWithReason(.StillImageOutputDoesNotExist)
+//            return
+//        }
+//        
+//        let connection = stillImageOutput.connectionWithMediaType(AVMediaTypeVideo)
+//        connection.videoOrientation = previewLayer.connection.videoOrientation
+//        
+//        var numberOfWaitingBrackets = bracketSettings.count
+//        var oneOfTheErrors: NSError? = nil
+//        
+//        imageComposer.reset()
+//        
+//        stillImageOutput.captureStillImageBracketAsynchronouslyFromConnection(connection, withSettingsArray: bracketSettings) { (sampleBuffer: CMSampleBuffer!, stillImageSettings: AVCaptureBracketedStillImageSettings!, error: NSError!) -> Void in
+//            numberOfWaitingBrackets--
+//            
+//            var currentImageData: NSData?
+//            ObjcUtility.tryBlock({ () -> Void in
+//                let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer)
+//                print(NSDate().timeIntervalSince1970)
+//                self.imageComposer.addImageData(imageData)
+//                currentImageData = imageData
+//                
+//                }, catchBlock: { (exception: NSException!) -> Void in
+//                    oneOfTheErrors = error
 //                    
-//                })
+//                }, finallyBlock: { () -> Void in
+//                    if numberOfWaitingBrackets == 0 {
+//                        if let _ = oneOfTheErrors {
+//                            print(oneOfTheErrors)
+//                            self.failedWithReason(.BracketedCaptureContainsNullBuffer)
+//                            completion(success: false)
+//                            return
+//                        }
+//                        
+//                        if let originalData = currentImageData, originalImage = UIImage(data: originalData), processedImage = self.imageComposer.process() {
+//                            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+//                                self.delegate?.sessionManager(self, originalImage: originalImage, processedImage: processedImage)
+//                            })
+//                            completion(success: true)
+//                            return
+//                        }
+//                        
+//                        completion(success: false)
+//                    }
 //            })
-        }
-    }
-    
-    private func performSingleCapture() {
-        guard let stillImageOutput = self.currentOutput else {
-            self.failedWithReason(.StillImageOutputDoesNotExist)
-            return
-        }
-        
-        let connection = stillImageOutput.connectionWithMediaType(AVMediaTypeVideo)
-        connection.videoOrientation = self.previewLayer.connection.videoOrientation
-        
-        // might want to update flash settings (see line 558 in AAPLCameraViewController.m from AVCam)
-        
-        stillImageOutput.captureStillImageAsynchronouslyFromConnection(connection, completionHandler: { (imageDataSampleBuffer: CMSampleBuffer!, error: NSError!) -> Void in
-            // The sample buffer is not retained. Create image data before saving the still image to the photo library asynchronously.
-            let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(imageDataSampleBuffer)
-            self.saveImage(imageData)
-        })
-    }
-    
-    private func saveImage(imageData: NSData) {
-        PHPhotoLibrary.requestAuthorization({ (status: PHAuthorizationStatus) -> Void in
-            if status != .Authorized {
-                self.failedWithReason(.PhotosAccessNotAuthorized)
-                return
-            }
-            
-            // TODO: iOS9 - use PHAssetCreationRequest.addResourceWithType() instead
-            // see line 569 in AAPLCameraViewController.m from AVCam
-            
-            guard let temporaryFileURL = Utility.getTemporaryFileURL() else {
-                self.failedWithReason(.ImageTemporaryFileCannotBeCreated)
-                return
-            }
-            
-            PHPhotoLibrary.sharedPhotoLibrary().performChanges({ () -> Void in
-                imageData.writeToURL(temporaryFileURL, atomically: true)
-                PHAssetChangeRequest.creationRequestForAssetFromImageAtFileURL(temporaryFileURL)
-                
-                }, completionHandler: { (success: Bool, error: NSError?) -> Void in
-                    if !success {
-                        if let _ = error {
-                            self.failedWithReason(.ImageCannotBeSaved)
-                            print("Error occurred while saving image to photo library: \(error)")
-                            
-                        } else {
-                            self.failedWithReason(.Unknown)
-                        }
-                        
-                        try! NSFileManager.defaultManager().removeItemAtURL(temporaryFileURL)
-                    }
-            })
-        })
-    }
+//        }
+//    }
+//    
+//    private func performSingleCapture() {
+//        guard let stillImageOutput = self.currentOutput else {
+//            self.failedWithReason(.StillImageOutputDoesNotExist)
+//            return
+//        }
+//        
+//        let connection = stillImageOutput.connectionWithMediaType(AVMediaTypeVideo)
+//        connection.videoOrientation = self.previewLayer.connection.videoOrientation
+//        
+//        // might want to update flash settings (see line 558 in AAPLCameraViewController.m from AVCam)
+//        
+//        stillImageOutput.captureStillImageAsynchronouslyFromConnection(connection, completionHandler: { (imageDataSampleBuffer: CMSampleBuffer!, error: NSError!) -> Void in
+//            // The sample buffer is not retained. Create image data before saving the still image to the photo library asynchronously.
+//            let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(imageDataSampleBuffer)
+//            self.saveImage(imageData)
+//        })
+//    }
+//    
+//    private func saveImage(imageData: NSData) {
+//        PHPhotoLibrary.requestAuthorization({ (status: PHAuthorizationStatus) -> Void in
+//            if status != .Authorized {
+//                self.failedWithReason(.PhotosAccessNotAuthorized)
+//                return
+//            }
+//            
+//            // TODO: iOS9 - use PHAssetCreationRequest.addResourceWithType() instead
+//            // see line 569 in AAPLCameraViewController.m from AVCam
+//            
+//            guard let temporaryFileURL = Utility.getTemporaryFileURL() else {
+//                self.failedWithReason(.ImageTemporaryFileCannotBeCreated)
+//                return
+//            }
+//            
+//            PHPhotoLibrary.sharedPhotoLibrary().performChanges({ () -> Void in
+//                imageData.writeToURL(temporaryFileURL, atomically: true)
+//                PHAssetChangeRequest.creationRequestForAssetFromImageAtFileURL(temporaryFileURL)
+//                
+//                }, completionHandler: { (success: Bool, error: NSError?) -> Void in
+//                    if !success {
+//                        if let _ = error {
+//                            self.failedWithReason(.ImageCannotBeSaved)
+//                            print("Error occurred while saving image to photo library: \(error)")
+//                            
+//                        } else {
+//                            self.failedWithReason(.Unknown)
+//                        }
+//                        
+//                        try! NSFileManager.defaultManager().removeItemAtURL(temporaryFileURL)
+//                    }
+//            })
+//        })
+//    }
 
     
     // MARK: I/O setup
