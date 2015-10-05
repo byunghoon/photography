@@ -45,7 +45,7 @@ class ImageViewController: UIViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        viewMode = .Full
+        viewMode = .Scaled
         presentedImage = .Original
     }
     

@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		440239391BC17225007910BE /* ImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440239381BC17225007910BE /* ImageViewController.swift */; settings = {ASSET_TAGS = (); }; };
-		4402393B1BC19674007910BE /* AttitudeCubicSpline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4402393A1BC19674007910BE /* AttitudeCubicSpline.swift */; settings = {ASSET_TAGS = (); }; };
+		4402393B1BC19674007910BE /* AttitudeInterpolator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4402393A1BC19674007910BE /* AttitudeInterpolator.swift */; settings = {ASSET_TAGS = (); }; };
 		444B25A71B63F3D60056D3E3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 444B25A61B63F3D60056D3E3 /* AppDelegate.swift */; };
 		444B25A91B63F3D60056D3E3 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 444B25A81B63F3D60056D3E3 /* MainViewController.swift */; };
 		444B25AC1B63F3D60056D3E3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 444B25AA1B63F3D60056D3E3 /* Main.storyboard */; };
@@ -39,7 +39,7 @@
 /* Begin PBXFileReference section */
 		3BAB0835282C4BF5C2CBB7E3 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		440239381BC17225007910BE /* ImageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageViewController.swift; sourceTree = "<group>"; };
-		4402393A1BC19674007910BE /* AttitudeCubicSpline.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AttitudeCubicSpline.swift; sourceTree = "<group>"; };
+		4402393A1BC19674007910BE /* AttitudeInterpolator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AttitudeInterpolator.swift; sourceTree = "<group>"; };
 		444B25A11B63F3D60056D3E3 /* Photography.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Photography.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		444B25A51B63F3D60056D3E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		444B25A61B63F3D60056D3E3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -111,6 +111,7 @@
 				444B25A81B63F3D60056D3E3 /* MainViewController.swift */,
 				440239381BC17225007910BE /* ImageViewController.swift */,
 				44825FF21B9230E5002C2D64 /* SessionManager.swift */,
+				4402393A1BC19674007910BE /* AttitudeInterpolator.swift */,
 				449E22761B9CADB5007EA099 /* ImageComposer.swift */,
 				444B25A61B63F3D60056D3E3 /* AppDelegate.swift */,
 				444B25AA1B63F3D60056D3E3 /* Main.storyboard */,
@@ -154,7 +155,6 @@
 				44E7D7811B92743E002BD30C /* Utility.swift */,
 				4490614A1B9D8DF800D3EFE0 /* ObjcUtility.h */,
 				4490614B1B9D8DF800D3EFE0 /* ObjcUtility.m */,
-				4402393A1BC19674007910BE /* AttitudeCubicSpline.swift */,
 			);
 			name = Common;
 			sourceTree = "<group>";
@@ -350,7 +350,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4402393B1BC19674007910BE /* AttitudeCubicSpline.swift in Sources */,
+				4402393B1BC19674007910BE /* AttitudeInterpolator.swift in Sources */,
 				440239391BC17225007910BE /* ImageViewController.swift in Sources */,
 				44E7D7821B92743E002BD30C /* Utility.swift in Sources */,
 				444B25A91B63F3D60056D3E3 /* MainViewController.swift in Sources */,

@@ -253,11 +253,11 @@ extension SessionManager {
             return
         }
         
-        var points: [TimeRotationPair] = []
+        var points: [TimeAttitudePair] = []
         self.motionManager.deviceMotionUpdateInterval = 0.01
         self.motionManager.startDeviceMotionUpdatesToQueue(NSOperationQueue.mainQueue()) { (motion: CMDeviceMotion?, error: NSError?) -> Void in
             if let attitude = motion?.attitude {
-                points.append(TimeRotationPair(time: NSDate().timeIntervalSince1970, rotationMatrix: attitude.rotationMatrix))
+                points.append(TimeAttitudePair(time: NSDate().timeIntervalSince1970, attitude: attitude))
             }
         }
         
@@ -282,46 +282,46 @@ extension SessionManager {
             } else if numberOfWaitingBrackets == 0 {
                 time2 = NSDate().timeIntervalSince1970
                 
+                let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer)
+                guard let rawImage = UIImage(data: imageData), rawImageCI = CIImage(image: rawImage) else {
+                    return
+                }
+                
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.1 * Double(NSEC_PER_SEC))), self.queue) { () -> Void in
-                    let spline1 = TimeRotationSpline(points: self.relevantPoints(points, time: time1))
-                    print(spline1.interpolate(time1))
+                    let attitude1 = AttitudeInterpolator.interpolate(points, time: time1)
+                    let attitude2 = AttitudeInterpolator.interpolate(points, time: time2)
                     
-                    let spline2 = TimeRotationSpline(points: self.relevantPoints(points, time: time2))
-                    print(spline2.interpolate(time2))
+                    let diff = Attitude(pitch: attitude2.pitch - attitude1.pitch, roll: attitude2.roll - attitude1.roll, yaw: attitude2.yaw - attitude1.yaw)
+                    
+                    var transform = CATransform3DMakeRotation(diff.pitch, 1, 0, 0)
+                    transform = CATransform3DRotate(transform, diff.roll, 0, 1, 0)
+                    transform = CATransform3DRotate(transform, diff.yaw, 0, 0, 1)
+                    
+                    let quad = AGKQuadApplyCATransform3D(AGKQuadMakeWithCGRect(rawImageCI.extent), transform)
+                    print(quad)
+                    
+                    let inputs = [
+                        "inputImage": rawImageCI,
+                        "inputTopLeft": CIVector(x: quad.bl.x, y: quad.bl.y),
+                        "inputTopRight": CIVector(x: quad.br.x, y: quad.br.y),
+                        "inputBottomRight": CIVector(x: quad.tr.x, y: quad.tr.y),
+                        "inputBottomLeft": CIVector(x: quad.tl.x, y: quad.tl.y)
+                    ]
+                    
+                    let processedImageCI = rawImageCI.imageByApplyingFilter("CIPerspectiveTransform", withInputParameters: inputs)
+                    let processedImageCG = CIContext(options: nil).createCGImage(processedImageCI, fromRect: processedImageCI.extent)
+                    
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        self.delegate?.sessionManager(self, originalImage: originalImage, processedImage: UIImage(CGImage: processedImageCG, scale: 1, orientation: rawImage.imageOrientation))
+                    })
                     
                     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.1 * Double(NSEC_PER_SEC))), self.queue) { () -> Void in
                         self.motionManager.stopDeviceMotionUpdates()
                     }
                 }
-                
-                guard let rawImage = UIImage(data: AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer)) else {
-                    return
-                }
-                
-                let transform = CATransform3D(m11: CGFloat(r.m11), m12: CGFloat(r.m12), m13: CGFloat(r.m13), m14: 0, m21: CGFloat(r.m21), m22: CGFloat(r.m22), m23: CGFloat(r.m23), m24: 0, m31: CGFloat(r.m31), m32: CGFloat(r.m32), m33: CGFloat(r.m33), m34: 0, m41: 0, m42: 0, m43: 0, m44: 1)
-                
-                let originalQuad = AGKQuadMakeWithCGSize(rawImage.size)
-                let transformedQuad = AGKQuadApplyCATransform3D(originalQuad, <#T##t: CATransform3D##CATransform3D#>)
-                
-//                let originalRect = CGRect(x: 0, y: 0, width: rawImage.size.width, height: rawImage.size.height)
-//                let transformedRect = CGRectApplyAffineTransform(originalRect, CATransform3DMakeAffineTransform)
-                
-//                dispatch_async(dispatch_get_main_queue(), { () -> Void in
-//                    self.delegate?.sessionManager(self, originalImage: originalImage, processedImage: processedImage)
-//            
-//                })
             }
         }
-    }
-    
-    private func relevantPoints(points: [TimeRotationPair], time: NSTimeInterval) -> [TimeRotationPair]  {
-        for var i = 2; i < points.count - 1; i++ {
-            if points[i].time > time {
-                return [points[i-1], points[i]]
-            }
-        }
-        return []
-    }
+    }    
     
 //    private func performBracketedCapture(completion: ImageCompletion) {
 //        guard let stillImageOutput = currentOutput else {
